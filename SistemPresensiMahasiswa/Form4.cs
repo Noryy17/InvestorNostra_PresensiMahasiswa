@@ -15,7 +15,7 @@ namespace SistemPresensiMahasiswa
     {
         private readonly SqlConnection conn;
         private readonly string connectionString =
-        "Data Source=VICTUS-PUNYA-LU\\LUTFI;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        "Data Source=LAPTOP-2TIS9UVD\\RIZQIHUDAYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
         public GenerateLaporan()
         {
             InitializeComponent();
