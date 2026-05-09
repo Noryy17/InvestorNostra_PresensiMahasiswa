@@ -187,6 +187,7 @@ namespace SistemPresensiMahasiswa
                 dataGridView1.Rows.Clear();
                 dataGridView1.Columns.Clear();
 
+                dataGridView1.Columns.Add("id_dosen", "id_dosen");
                 dataGridView1.Columns.Add("NIP", "NIP");
                 dataGridView1.Columns.Add("nama", "nama");
                 dataGridView1.Columns.Add("username", "username");
@@ -200,6 +201,7 @@ namespace SistemPresensiMahasiswa
                 while (reader.Read())
                 {
                     dataGridView1.Rows.Add(
+                        reader["id_dosen"].ToString(),
                         reader["NIP"].ToString(),
                         reader["Nama"].ToString(),
                         reader["Username"].ToString(),
