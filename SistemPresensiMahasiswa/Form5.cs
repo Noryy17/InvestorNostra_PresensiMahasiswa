@@ -237,5 +237,15 @@ namespace SistemPresensiMahasiswa
                 txtJurusan.Text = row.Cells["Jurusan"].Value.ToString();
             }
         }
+
+        private void txtNIM_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            
+        }
+
+        private void txtNama_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            
+        }
     }
 }

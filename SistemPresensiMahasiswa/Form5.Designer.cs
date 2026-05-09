@@ -30,6 +30,7 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.txtJurusan = new System.Windows.Forms.TextBox();
             this.txtNIM = new System.Windows.Forms.TextBox();
             this.txtNama = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -41,13 +42,12 @@
             this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
             this.btnUbah = new System.Windows.Forms.Button();
             this.btnTambah = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtJurusan = new System.Windows.Forms.TextBox();
             this.btnKembali = new System.Windows.Forms.Button();
-            this.btnLoad = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel2.SuspendLayout();
@@ -76,12 +76,21 @@
             this.panel1.TabIndex = 1;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
+            // txtJurusan
+            // 
+            this.txtJurusan.Location = new System.Drawing.Point(142, 97);
+            this.txtJurusan.Name = "txtJurusan";
+            this.txtJurusan.Size = new System.Drawing.Size(197, 22);
+            this.txtJurusan.TabIndex = 6;
+            this.txtJurusan.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
+            // 
             // txtNIM
             // 
             this.txtNIM.Location = new System.Drawing.Point(142, 27);
             this.txtNIM.Name = "txtNIM";
             this.txtNIM.Size = new System.Drawing.Size(197, 22);
             this.txtNIM.TabIndex = 5;
+            this.txtNIM.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNIM_KeyPress);
             // 
             // txtNama
             // 
@@ -89,6 +98,7 @@
             this.txtNama.Name = "txtNama";
             this.txtNama.Size = new System.Drawing.Size(197, 22);
             this.txtNama.TabIndex = 4;
+            this.txtNama.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNama_KeyPress);
             // 
             // label5
             // 
@@ -173,6 +183,16 @@
             this.panel2.Size = new System.Drawing.Size(535, 100);
             this.panel2.TabIndex = 4;
             // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(411, 29);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(97, 40);
+            this.btnLoad.TabIndex = 3;
+            this.btnLoad.Text = "Load";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
             // btnHapus
             // 
             this.btnHapus.Location = new System.Drawing.Point(292, 29);
@@ -212,14 +232,6 @@
             this.label6.TabIndex = 6;
             this.label6.Text = "Aksi";
             // 
-            // txtJurusan
-            // 
-            this.txtJurusan.Location = new System.Drawing.Point(142, 97);
-            this.txtJurusan.Name = "txtJurusan";
-            this.txtJurusan.Size = new System.Drawing.Size(197, 22);
-            this.txtJurusan.TabIndex = 6;
-            this.txtJurusan.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
-            // 
             // btnKembali
             // 
             this.btnKembali.BackColor = System.Drawing.Color.Red;
@@ -230,16 +242,6 @@
             this.btnKembali.Text = "Kembali";
             this.btnKembali.UseVisualStyleBackColor = false;
             this.btnKembali.Click += new System.EventHandler(this.btnKembali_Click);
-            // 
-            // btnLoad
-            // 
-            this.btnLoad.Location = new System.Drawing.Point(411, 29);
-            this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(97, 40);
-            this.btnLoad.TabIndex = 3;
-            this.btnLoad.Text = "Load";
-            this.btnLoad.UseVisualStyleBackColor = true;
-            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // KelolaMahasiswa
             // 

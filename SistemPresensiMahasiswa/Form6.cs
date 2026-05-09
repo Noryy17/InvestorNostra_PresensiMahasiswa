@@ -224,5 +224,10 @@ namespace SistemPresensiMahasiswa
             DashboardAdmin dashboardAdminForm = new DashboardAdmin();
             dashboardAdminForm.Show();
         }
+
+        private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            
+        }
     }
 }

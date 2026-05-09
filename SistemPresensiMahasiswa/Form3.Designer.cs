@@ -58,10 +58,12 @@
             // 
             // txtNIP
             // 
-            this.txtNIP.Location = new System.Drawing.Point(190, 44);
+            this.txtNIP.Location = new System.Drawing.Point(190, 45);
+            this.txtNIP.MaxLength = 18;
             this.txtNIP.Name = "txtNIP";
             this.txtNIP.Size = new System.Drawing.Size(242, 22);
             this.txtNIP.TabIndex = 1;
+            this.txtNIP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNIP_KeyPress);
             // 
             // txtNama
             // 
@@ -69,6 +71,7 @@
             this.txtNama.Name = "txtNama";
             this.txtNama.Size = new System.Drawing.Size(242, 22);
             this.txtNama.TabIndex = 2;
+            this.txtNama.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNama_KeyPress);
             // 
             // txtUsername
             // 

@@ -60,6 +60,7 @@
             this.txtKodeMK.Name = "txtKodeMK";
             this.txtKodeMK.Size = new System.Drawing.Size(266, 22);
             this.txtKodeMK.TabIndex = 1;
+            this.txtKodeMK.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtKodeMK_KeyPress);
             // 
             // txtNamaMK
             // 

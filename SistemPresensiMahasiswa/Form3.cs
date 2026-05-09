@@ -231,6 +231,7 @@ namespace SistemPresensiMahasiswa
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
+                
                 txtNIP.Text = row.Cells["NIP"].Value.ToString();
                 txtNama.Text = row.Cells["Nama"].Value.ToString();
                 txtUsername.Text = row.Cells["Username"].Value.ToString();
@@ -243,6 +244,26 @@ namespace SistemPresensiMahasiswa
             this.Close();
             DashboardAdmin dashboardAdminForm = new DashboardAdmin();
             dashboardAdminForm.Show();
+        }
+
+        private void txtNIP_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Cek apakah karakter yang ditekan bukan angka DAN bukan tombol Backspace
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input karakter tersebut
+                MessageBox.Show("NIP hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void txtNama_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Cek apakah karakter bukan huruf, bukan spasi, DAN bukan Backspace
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input
+                MessageBox.Show("Nama hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }
