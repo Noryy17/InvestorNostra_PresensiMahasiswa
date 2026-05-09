@@ -130,11 +130,13 @@
             // txtSKS
             // 
             this.txtSKS.Location = new System.Drawing.Point(160, 168);
+            this.txtSKS.MaxLength = 1;
             this.txtSKS.Name = "txtSKS";
             this.txtSKS.Size = new System.Drawing.Size(266, 22);
             this.txtSKS.TabIndex = 10;
             this.txtSKS.UseWaitCursor = true;
             this.txtSKS.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSKS_KeyPress);
+            this.txtSKS.Validating += new System.ComponentModel.CancelEventHandler(this.txtSKS_Validating);
             // 
             // btnLoad
             // 

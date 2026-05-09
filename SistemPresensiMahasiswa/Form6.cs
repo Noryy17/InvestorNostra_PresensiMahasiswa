@@ -234,5 +234,19 @@ namespace SistemPresensiMahasiswa
                 MessageBox.Show("SKS hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
+        private void txtSKS_Validating(object sender, CancelEventArgs e)
+        {
+            int nilaiSks;
+            if (int.TryParse(txtSKS.Text, out nilaiSks))
+            {
+                if (nilaiSks < 1 || nilaiSks > 6)
+                {
+                    MessageBox.Show("SKS harus di antara 1 sampai 6!");
+                    txtSKS.Clear();
+                    e.Cancel = true; // Mencegah user pindah ke input lain sebelum diperbaiki
+                }
+            }
+        }
     }
 }

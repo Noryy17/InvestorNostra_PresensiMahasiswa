@@ -84,6 +84,7 @@
             // txtNIM
             // 
             this.txtNIM.Location = new System.Drawing.Point(99, 28);
+            this.txtNIM.MaxLength = 11;
             this.txtNIM.Name = "txtNIM";
             this.txtNIM.Size = new System.Drawing.Size(197, 22);
             this.txtNIM.TabIndex = 5;
