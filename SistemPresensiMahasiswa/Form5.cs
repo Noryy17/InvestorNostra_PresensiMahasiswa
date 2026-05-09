@@ -178,6 +178,7 @@ namespace SistemPresensiMahasiswa
                 dataGridView1.Rows.Clear();
                 dataGridView1.Columns.Clear();
 
+                dataGridView1.Columns.Add("id_mahasiswa", "id_mahasiswa");
                 dataGridView1.Columns.Add("NIM", "NIM");
                 dataGridView1.Columns.Add("nama", "nama");
                 dataGridView1.Columns.Add("jurusan", "jurusan");
@@ -190,6 +191,7 @@ namespace SistemPresensiMahasiswa
                 while (reader.Read())
                 {
                     dataGridView1.Rows.Add(
+                        reader["id_mahasiswa"].ToString(),
                         reader["NIM"].ToString(),
                         reader["Nama"].ToString(),
                         reader["Jurusan"].ToString()
@@ -231,6 +233,7 @@ namespace SistemPresensiMahasiswa
             if (e.RowIndex >= 0) // make sure it's not the header row
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
 
                 txtNIM.Text = row.Cells["NIM"].Value.ToString();
                 txtNama.Text = row.Cells["Nama"].Value.ToString();

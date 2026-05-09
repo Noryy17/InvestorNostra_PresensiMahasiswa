@@ -225,9 +225,14 @@ namespace SistemPresensiMahasiswa
             dashboardAdminForm.Show();
         }
 
-        private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
+        private void txtSKS_KeyPress(object sender, KeyPressEventArgs e)
         {
-            
+            // Cek apakah karakter yang ditekan bukan angka DAN bukan tombol Backspace
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input karakter tersebut
+                MessageBox.Show("SKS hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }

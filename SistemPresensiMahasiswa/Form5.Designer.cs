@@ -38,9 +38,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
@@ -78,7 +75,7 @@
             // 
             // txtJurusan
             // 
-            this.txtJurusan.Location = new System.Drawing.Point(142, 97);
+            this.txtJurusan.Location = new System.Drawing.Point(99, 97);
             this.txtJurusan.Name = "txtJurusan";
             this.txtJurusan.Size = new System.Drawing.Size(197, 22);
             this.txtJurusan.TabIndex = 6;
@@ -86,7 +83,7 @@
             // 
             // txtNIM
             // 
-            this.txtNIM.Location = new System.Drawing.Point(142, 27);
+            this.txtNIM.Location = new System.Drawing.Point(99, 28);
             this.txtNIM.Name = "txtNIM";
             this.txtNIM.Size = new System.Drawing.Size(197, 22);
             this.txtNIM.TabIndex = 5;
@@ -94,7 +91,7 @@
             // 
             // txtNama
             // 
-            this.txtNama.Location = new System.Drawing.Point(142, 62);
+            this.txtNama.Location = new System.Drawing.Point(99, 65);
             this.txtNama.Name = "txtNama";
             this.txtNama.Size = new System.Drawing.Size(197, 22);
             this.txtNama.TabIndex = 4;
@@ -103,7 +100,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(33, 100);
+            this.label5.Location = new System.Drawing.Point(33, 97);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(60, 16);
             this.label5.TabIndex = 2;
@@ -112,7 +109,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(33, 62);
+            this.label4.Location = new System.Drawing.Point(43, 65);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(50, 16);
             this.label4.TabIndex = 1;
@@ -121,7 +118,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(33, 34);
+            this.label3.Location = new System.Drawing.Point(56, 28);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 16);
             this.label3.TabIndex = 0;
@@ -139,10 +136,6 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColNim,
-            this.ColNamaMahasiswa,
-            this.ColJurusan});
             this.dataGridView1.Location = new System.Drawing.Point(585, 57);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
@@ -150,27 +143,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(430, 511);
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            // 
-            // ColNim
-            // 
-            this.ColNim.HeaderText = "Nim";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
-            // 
-            // ColNamaMahasiswa
-            // 
-            this.ColNamaMahasiswa.HeaderText = "Nama Mahasiswa";
-            this.ColNamaMahasiswa.MinimumWidth = 6;
-            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
-            this.ColNamaMahasiswa.Width = 125;
-            // 
-            // ColJurusan
-            // 
-            this.ColJurusan.HeaderText = "Jurusan";
-            this.ColJurusan.MinimumWidth = 6;
-            this.ColJurusan.Name = "ColJurusan";
-            this.ColJurusan.Width = 125;
             // 
             // panel2
             // 
@@ -282,9 +254,6 @@
         private System.Windows.Forms.Button btnUbah;
         private System.Windows.Forms.Button btnTambah;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
         private System.Windows.Forms.TextBox txtJurusan;
         private System.Windows.Forms.Button btnKembali;
         private System.Windows.Forms.Button btnLoad;
