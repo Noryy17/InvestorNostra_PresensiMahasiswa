@@ -99,3 +99,16 @@ INSERT INTO KRS (id_mahasiswa, id_matakuliah) VALUES
     (1,1),(1,2),(2,1),(2,2),(3,1),(3,3),
     (4,2),(4,3),(5,1),(5,2),(5,3);
 GO
+CREATE VIEW vwMahasiswaPublic AS
+SELECT
+	NIM,
+	Nama,
+	Jurusan
+FROM Mahasiswa;
+
+DROP TABLE IF EXISTS Mahasiswa_Backup;
+GO
+
+SELECT *
+INTO Mahasiswa_Backup
+FROM Mahasiswa;
