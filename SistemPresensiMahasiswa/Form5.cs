@@ -11,9 +11,9 @@ namespace SistemPresensiMahasiswa
         private BindingSource bindingSource = new BindingSource();
         private DataTable dtMahasiswa = new DataTable();
 
-        // Sesuaikan connection string dengan server Anda
+        // Connection string sudah disesuaikan dengan milik Dain
         private readonly string connectionString =
-            "Data Source=LAPTOP-2TIS9UVD\\RIZQIHUDAYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+            "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
 
         public KelolaMahasiswa()
         {
@@ -31,7 +31,6 @@ namespace SistemPresensiMahasiswa
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             // FIX 1: Mapping Kolom UI ke Kolom Database
-            // Pastikan string ini sesuai huruf besar/kecil dengan di database Anda!
             ColNim.DataPropertyName = "nim";
             ColNamaMahasiswa.DataPropertyName = "nama";
             ColJurusan.DataPropertyName = "jurusan";
@@ -42,7 +41,7 @@ namespace SistemPresensiMahasiswa
             LoadData();
         }
 
-        // MODUL 9 - LANGKAH 4: Menambahkan load data
+        // MODUL 9 - LANGKAH 4: Menambahkan load data (DIUPDATE PAKAI SP)
         private void LoadData()
         {
             try
@@ -50,23 +49,31 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "SELECT * FROM vwMahasiswaPublic";
 
-                    using (SqlDataAdapter da = new SqlDataAdapter(query, conn))
+                    // Menggunakan Stored Procedure sp_GetMahasiswa alih-alih query biasa
+                    using (SqlCommand cmd = new SqlCommand("sp_GetMahasiswa", conn))
                     {
-                        dtMahasiswa = new DataTable();
-                        da.Fill(dtMahasiswa);
+                        cmd.CommandType = CommandType.StoredProcedure; // Wajib agar sistem tahu ini SP
 
-                        bindingSource.DataSource = dtMahasiswa;
-                        dataGridView1.DataSource = bindingSource;
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            dtMahasiswa = new DataTable();
+                            da.Fill(dtMahasiswa);
 
-                        BindControls();
+                            bindingSource.DataSource = dtMahasiswa;
+                            dataGridView1.DataSource = bindingSource;
+
+                            BindControls();
+                        }
                     }
                 }
+
+                // Panggil fitur hitung total setelah data berhasil dimuat
+                HitungTotal();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal load data: " + ex.Message);
+                MessageBox.Show("Gagal load data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -89,7 +96,7 @@ namespace SistemPresensiMahasiswa
             LoadData();
         }
 
-        // MODUL 9 - LANGKAH 8: INSERT Aman (Parameterized Query)
+        // MODUL 9 - LANGKAH 8: INSERT Aman (DIUPDATE PAKAI SP)
         private void btnTambah_Click(object sender, EventArgs e)
         {
             try
@@ -101,10 +108,10 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "INSERT INTO Mahasiswa (nim, nama, jurusan) VALUES (@NIM, @Nama, @Jurusan)";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand("sp_InsertMahasiswaBaru", conn))
                     {
+                        cmd.CommandType = CommandType.StoredProcedure; // Panggil SP Insert
+
                         cmd.Parameters.AddWithValue("@NIM", txtNIM.Text);
                         cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
                         cmd.Parameters.AddWithValue("@Jurusan", txtJurusan.Text);
@@ -112,17 +119,17 @@ namespace SistemPresensiMahasiswa
                     }
                 }
 
-                MessageBox.Show("Data Mahasiswa berhasil ditambahkan");
+                MessageBox.Show("Data Mahasiswa berhasil ditambahkan", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ClearForm();
-                LoadData();
+                LoadData(); // LoadData sudah memuat HitungTotal di dalamnya
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error Tambah", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // UPDATE (Lanjutan Penerapan Aman)
+        // UPDATE (DIUPDATE PAKAI SP)
         private void btnUbah_Click(object sender, EventArgs e)
         {
             try
@@ -130,10 +137,10 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = @"UPDATE Mahasiswa SET Nama = @Nama, Jurusan = @Jurusan WHERE NIM = @NIM";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand("sp_UpdateMahasiswa", conn))
                     {
+                        cmd.CommandType = CommandType.StoredProcedure; // Panggil SP Update
+
                         cmd.Parameters.AddWithValue("@NIM", txtNIM.Text);
                         cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
                         cmd.Parameters.AddWithValue("@Jurusan", txtJurusan.Text);
@@ -141,7 +148,7 @@ namespace SistemPresensiMahasiswa
                         int result = cmd.ExecuteNonQuery();
                         if (result > 0)
                         {
-                            MessageBox.Show("Data berhasil diupdate");
+                            MessageBox.Show("Data berhasil diupdate", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             ClearForm();
                             LoadData();
                         }
@@ -154,44 +161,43 @@ namespace SistemPresensiMahasiswa
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error Ubah", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // DELETE (Lanjutan Penerapan Aman)
+        // DELETE (DIUPDATE PAKAI SP)
         private void btnHapus_Click(object sender, EventArgs e)
         {
             try
             {
-                DialogResult resultConfirm = MessageBox.Show("Yakin ingin menghapus data?", "Konfirmasi",
-                                                             MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resultConfirm = MessageBox.Show("Yakin ingin menghapus data dengan NIM " + txtNIM.Text + "?",
+                                                             "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
                 if (resultConfirm == DialogResult.Yes)
                 {
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
-                        string query = "DELETE FROM Mahasiswa WHERE NIM = @NIM";
-
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        using (SqlCommand cmd = new SqlCommand("sp_DeleteMahasiswa", conn))
                         {
+                            cmd.CommandType = CommandType.StoredProcedure; // Panggil SP Delete
                             cmd.Parameters.AddWithValue("@NIM", txtNIM.Text);
                             cmd.ExecuteNonQuery();
                         }
                     }
 
-                    MessageBox.Show("Data berhasil dihapus");
+                    MessageBox.Show("Data berhasil dihapus", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ClearForm();
                     LoadData();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error Hapus", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // MODUL 9 - LANGKAH 9: Script Reset Data Otomatis (DENGAN FIX IDENTITY_INSERT)
+        // MODUL 9 - LANGKAH 9: Script Reset Data Otomatis
         private void btnReset_Click(object sender, EventArgs e)
         {
             try
@@ -199,10 +205,6 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-
-                    // Menggunakan teknik UPDATE JOIN alih-alih DELETE & INSERT
-                    // Ini akan menyalin kembali nama & jurusan dari tabel Backup ke tabel utama
-                    // tanpa merusak relasi dengan tabel Presensi atau memicu error Identity.
                     string query = @"
                 IF OBJECT_ID('dbo.Mahasiswa_Backup') IS NOT NULL
                 BEGIN
@@ -236,9 +238,6 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-
-                    // QUERY TIDAK AMAN - String Concatenation sesuai modul
-                    // Coba masukkan di text NIM: ' OR 1=1 --
                     string query = "UPDATE Mahasiswa SET Nama='HACKED' WHERE NIM='" + txtNIM.Text + "'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -247,7 +246,6 @@ namespace SistemPresensiMahasiswa
                         MessageBox.Show(result + " baris terupdate");
                     }
                 }
-
                 LoadData();
             }
             catch (Exception ex)
@@ -280,6 +278,41 @@ namespace SistemPresensiMahasiswa
             txtNama.Clear();
             txtJurusan.Clear();
             txtNIM.Focus();
+        }
+
+        // Event kosong
+        private void lblTotal_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // FUNGSI LAMA: Hitung Total Mahasiswa dari Stored Procedure
+        private void HitungTotal()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_CountMahasiswa", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        SqlParameter outputParam = new SqlParameter("@Total", SqlDbType.Int);
+                        outputParam.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(outputParam);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+
+                        // Pastikan di form design Dain ada Label bernama 'lblTotal'
+                        lblTotal.Text = "Total Mahasiswa: " + outputParam.Value.ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                lblTotal.Text = "Total Mahasiswa: -";
+            }
         }
     }
 }

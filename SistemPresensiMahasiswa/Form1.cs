@@ -15,7 +15,7 @@ namespace SistemPresensiMahasiswa
     {
         private readonly SqlConnection conn;
         private readonly string connectionString =
-        "Data Source=LAPTOP-2TIS9UVD\\RIZQIHUDAYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
         public Login()
         {
             InitializeComponent();
@@ -87,6 +87,11 @@ namespace SistemPresensiMahasiswa
             {
                 MessageBox.Show("Terjadi kesalahan: " + ex.Message);
             }
+        }
+
+        private void PanelCard_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

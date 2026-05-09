@@ -67,6 +67,7 @@
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mahasiswaTableAdapter = new SistemPresensiMahasiswa.SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter();
+            this.lblTotal = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -87,6 +88,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lblTotal);
             this.panel1.Controls.Add(this.txtJurusan);
             this.panel1.Controls.Add(this.txtNIM);
             this.panel1.Controls.Add(this.txtNama);
@@ -415,6 +417,16 @@
             // 
             this.mahasiswaTableAdapter.ClearBeforeFill = true;
             // 
+            // lblTotal
+            // 
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Location = new System.Drawing.Point(175, 138);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(125, 16);
+            this.lblTotal.TabIndex = 7;
+            this.lblTotal.Text = "Total Mahasiswa : 0";
+            this.lblTotal.Click += new System.EventHandler(this.lblTotal_Click);
+            // 
             // KelolaMahasiswa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -486,5 +498,6 @@
         private SistemPresensiDBDataSet sistemPresensiDBDataSet;
         private System.Windows.Forms.BindingSource mahasiswaBindingSource;
         private SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter mahasiswaTableAdapter;
+        private System.Windows.Forms.Label lblTotal;
     }
 }

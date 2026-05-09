@@ -48,6 +48,7 @@
             this.PanelCard.Name = "PanelCard";
             this.PanelCard.Size = new System.Drawing.Size(400, 300);
             this.PanelCard.TabIndex = 0;
+            this.PanelCard.Paint += new System.Windows.Forms.PaintEventHandler(this.PanelCard_Paint);
             // 
             // LabelPassword
             // 
