@@ -27,3 +27,6 @@
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8a9d19b3-257f-4012-9e5e-dc3e940a9707" />
 --sesudah--
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8e7f04ec-68da-4ff9-96eb-c323ae96d0b5" />
+
+--Menambahkan button dan fungsi test injection,reset dan binding navigator--
+<img width="1918" height="1079" alt="image" src="https://github.com/user-attachments/assets/5b1676f0-59df-4a45-bc76-e5bf6a62ec6a" />
