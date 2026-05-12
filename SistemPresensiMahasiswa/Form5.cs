@@ -315,9 +315,34 @@ namespace SistemPresensiMahasiswa
             }
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        private void txtNIM_KeyPress(object sender, KeyPressEventArgs e)
         {
+            // Cek apakah karakter yang ditekan bukan angka DAN bukan tombol Backspace
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input karakter tersebut
+                MessageBox.Show("NIM hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
 
+        private void txtNama_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Cek apakah karakter bukan huruf, bukan spasi, DAN bukan Backspace
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input
+                MessageBox.Show("Nama hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void txtJurusan_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Cek apakah karakter bukan huruf, bukan spasi, DAN bukan Backspace
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input
+                MessageBox.Show("Jurusan hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }

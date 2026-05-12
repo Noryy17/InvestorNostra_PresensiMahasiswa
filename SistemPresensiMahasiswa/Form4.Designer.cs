@@ -40,6 +40,7 @@
             // 
             // cbMatakuliah
             // 
+            this.cbMatakuliah.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbMatakuliah.FormattingEnabled = true;
             this.cbMatakuliah.Location = new System.Drawing.Point(37, 53);
             this.cbMatakuliah.Name = "cbMatakuliah";
@@ -48,6 +49,7 @@
             // 
             // cbDosen
             // 
+            this.cbDosen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDosen.FormattingEnabled = true;
             this.cbDosen.Location = new System.Drawing.Point(296, 53);
             this.cbDosen.Name = "cbDosen";

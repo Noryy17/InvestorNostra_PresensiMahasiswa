@@ -43,9 +43,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
@@ -68,6 +65,9 @@
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mahasiswaTableAdapter = new SistemPresensiMahasiswa.SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter();
+            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -99,7 +99,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(535, 218);
             this.panel1.TabIndex = 1;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // lblTotal
             // 
@@ -118,6 +117,7 @@
             this.txtJurusan.Name = "txtJurusan";
             this.txtJurusan.Size = new System.Drawing.Size(197, 22);
             this.txtJurusan.TabIndex = 6;
+            this.txtJurusan.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtJurusan_KeyPress);
             // 
             // mahasiswaBindingSource
             // 
@@ -136,6 +136,7 @@
             this.txtNIM.Name = "txtNIM";
             this.txtNIM.Size = new System.Drawing.Size(197, 22);
             this.txtNIM.TabIndex = 5;
+            this.txtNIM.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNIM_KeyPress);
             // 
             // txtNama
             // 
@@ -144,6 +145,7 @@
             this.txtNama.Name = "txtNama";
             this.txtNama.Size = new System.Drawing.Size(197, 22);
             this.txtNama.TabIndex = 4;
+            this.txtNama.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNama_KeyPress);
             // 
             // label5
             // 
@@ -195,27 +197,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(430, 511);
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            // 
-            // ColNim
-            // 
-            this.ColNim.HeaderText = "Nim";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
-            // 
-            // ColNamaMahasiswa
-            // 
-            this.ColNamaMahasiswa.HeaderText = "Nama Mahasiswa";
-            this.ColNamaMahasiswa.MinimumWidth = 6;
-            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
-            this.ColNamaMahasiswa.Width = 125;
-            // 
-            // ColJurusan
-            // 
-            this.ColJurusan.HeaderText = "Jurusan";
-            this.ColJurusan.MinimumWidth = 6;
-            this.ColJurusan.Name = "ColJurusan";
-            this.ColJurusan.Width = 125;
             // 
             // panel2
             // 
@@ -428,6 +409,27 @@
             // 
             this.mahasiswaTableAdapter.ClearBeforeFill = true;
             // 
+            // ColNim
+            // 
+            this.ColNim.HeaderText = "NIM";
+            this.ColNim.MinimumWidth = 6;
+            this.ColNim.Name = "ColNim";
+            this.ColNim.Width = 125;
+            // 
+            // ColNamaMahasiswa
+            // 
+            this.ColNamaMahasiswa.HeaderText = "Column1";
+            this.ColNamaMahasiswa.MinimumWidth = 6;
+            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
+            this.ColNamaMahasiswa.Width = 125;
+            // 
+            // ColJurusan
+            // 
+            this.ColJurusan.HeaderText = "Jurusan";
+            this.ColJurusan.MinimumWidth = 6;
+            this.ColJurusan.Name = "ColJurusan";
+            this.ColJurusan.Width = 125;
+            // 
             // KelolaMahasiswa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -476,9 +478,6 @@
         private System.Windows.Forms.Button btnUbah;
         private System.Windows.Forms.Button btnTambah;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
         private System.Windows.Forms.TextBox txtJurusan;
         private System.Windows.Forms.Button btnKembali;
         private System.Windows.Forms.Button btnLoad;
@@ -500,5 +499,8 @@
         private System.Windows.Forms.BindingSource mahasiswaBindingSource;
         private SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter mahasiswaTableAdapter;
         private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
     }
 }
