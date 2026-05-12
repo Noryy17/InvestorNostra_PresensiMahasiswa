@@ -28,144 +28,124 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.cbMatakuliah = new System.Windows.Forms.ComboBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNama = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColHadir = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColIzin = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColSakit = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
-            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
-            this.button1 = new System.Windows.Forms.Button();
+            this.dtpAwal = new System.Windows.Forms.DateTimePicker();
+            this.dtpAkhir = new System.Windows.Forms.DateTimePicker();
+            this.btnRekap = new System.Windows.Forms.Button();
             this.btnKembali = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
-            // comboBox1
+            // cbMatakuliah
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(111, 53);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(216, 24);
-            this.comboBox1.TabIndex = 0;
+            this.cbMatakuliah.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbMatakuliah.FormattingEnabled = true;
+            this.cbMatakuliah.Location = new System.Drawing.Point(95, 78);
+            this.cbMatakuliah.Name = "cbMatakuliah";
+            this.cbMatakuliah.Size = new System.Drawing.Size(216, 24);
+            this.cbMatakuliah.TabIndex = 0;
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColNim,
-            this.ColNama,
-            this.ColHadir,
-            this.ColIzin,
-            this.ColSakit});
-            this.dataGridView1.Location = new System.Drawing.Point(482, 31);
+            this.dataGridView1.Location = new System.Drawing.Point(359, 34);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(679, 440);
+            this.dataGridView1.Size = new System.Drawing.Size(679, 365);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
-            // ColNim
+            // dtpAwal
             // 
-            this.ColNim.HeaderText = "Nim";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
+            this.dtpAwal.Location = new System.Drawing.Point(111, 135);
+            this.dtpAwal.Name = "dtpAwal";
+            this.dtpAwal.Size = new System.Drawing.Size(200, 22);
+            this.dtpAwal.TabIndex = 2;
             // 
-            // ColNama
+            // dtpAkhir
             // 
-            this.ColNama.HeaderText = "Nama";
-            this.ColNama.MinimumWidth = 6;
-            this.ColNama.Name = "ColNama";
-            this.ColNama.Width = 125;
+            this.dtpAkhir.Location = new System.Drawing.Point(111, 188);
+            this.dtpAkhir.Name = "dtpAkhir";
+            this.dtpAkhir.Size = new System.Drawing.Size(200, 22);
+            this.dtpAkhir.TabIndex = 3;
             // 
-            // ColHadir
+            // btnRekap
             // 
-            this.ColHadir.HeaderText = "Hadir";
-            this.ColHadir.MinimumWidth = 6;
-            this.ColHadir.Name = "ColHadir";
-            this.ColHadir.Width = 125;
-            // 
-            // ColIzin
-            // 
-            this.ColIzin.HeaderText = "Izin";
-            this.ColIzin.MinimumWidth = 6;
-            this.ColIzin.Name = "ColIzin";
-            this.ColIzin.Width = 125;
-            // 
-            // ColSakit
-            // 
-            this.ColSakit.HeaderText = "Sakit";
-            this.ColSakit.MinimumWidth = 6;
-            this.ColSakit.Name = "ColSakit";
-            this.ColSakit.Width = 125;
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(111, 126);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker1.TabIndex = 2;
-            // 
-            // dateTimePicker2
-            // 
-            this.dateTimePicker2.Location = new System.Drawing.Point(111, 210);
-            this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker2.TabIndex = 3;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(111, 280);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(146, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Template Rekap";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnRekap.BackColor = System.Drawing.Color.Lime;
+            this.btnRekap.Location = new System.Drawing.Point(12, 246);
+            this.btnRekap.Name = "btnRekap";
+            this.btnRekap.Size = new System.Drawing.Size(146, 57);
+            this.btnRekap.TabIndex = 4;
+            this.btnRekap.Text = "Rekap Presensi";
+            this.btnRekap.UseVisualStyleBackColor = false;
+            this.btnRekap.Click += new System.EventHandler(this.btnRekap_Click);
             // 
             // btnKembali
             // 
             this.btnKembali.BackColor = System.Drawing.Color.Red;
-            this.btnKembali.Location = new System.Drawing.Point(111, 357);
+            this.btnKembali.Location = new System.Drawing.Point(111, 349);
             this.btnKembali.Name = "btnKembali";
-            this.btnKembali.Size = new System.Drawing.Size(101, 27);
+            this.btnKembali.Size = new System.Drawing.Size(115, 31);
             this.btnKembali.TabIndex = 5;
             this.btnKembali.Text = "Kembali";
             this.btnKembali.UseVisualStyleBackColor = false;
             this.btnKembali.Click += new System.EventHandler(this.btnKembali_Click);
             // 
+            // btnClear
+            // 
+            this.btnClear.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnClear.Location = new System.Drawing.Point(181, 246);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(146, 57);
+            this.btnClear.TabIndex = 6;
+            this.btnClear.Text = "ClearForm";
+            this.btnClear.UseVisualStyleBackColor = false;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(95, 59);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(112, 16);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Nama Matakuliah";
+            // 
             // RekapPresensi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1271, 500);
+            this.ClientSize = new System.Drawing.Size(1066, 424);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnKembali);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.dateTimePicker2);
-            this.Controls.Add(this.dateTimePicker1);
+            this.Controls.Add(this.btnRekap);
+            this.Controls.Add(this.dtpAkhir);
+            this.Controls.Add(this.dtpAwal);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.cbMatakuliah);
             this.Name = "RekapPresensi";
             this.Text = "FormRekapPresensi";
+            this.Load += new System.EventHandler(this.FormRekapPresensi_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cbMatakuliah;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
-        private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNama;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColHadir;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColIzin;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColSakit;
+        private System.Windows.Forms.DateTimePicker dtpAwal;
+        private System.Windows.Forms.DateTimePicker dtpAkhir;
+        private System.Windows.Forms.Button btnRekap;
         private System.Windows.Forms.Button btnKembali;
+        private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.Label label1;
     }
 }
