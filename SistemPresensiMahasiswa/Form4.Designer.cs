@@ -28,46 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.cbMatakuliah = new System.Windows.Forms.ComboBox();
+            this.cbDosen = new System.Windows.Forms.ComboBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColTanggal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNama = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.dtpAwal = new System.Windows.Forms.DateTimePicker();
             this.btnGenerate = new System.Windows.Forms.Button();
-            this.dateTimePicker3 = new System.Windows.Forms.DateTimePicker();
+            this.dtpAkhir = new System.Windows.Forms.DateTimePicker();
             this.btnKembali = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
-            // comboBox1
+            // cbMatakuliah
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(37, 53);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(184, 24);
-            this.comboBox1.TabIndex = 0;
-            this.comboBox1.Text = "Pemrograman Dasar";
+            this.cbMatakuliah.FormattingEnabled = true;
+            this.cbMatakuliah.Location = new System.Drawing.Point(37, 53);
+            this.cbMatakuliah.Name = "cbMatakuliah";
+            this.cbMatakuliah.Size = new System.Drawing.Size(184, 24);
+            this.cbMatakuliah.TabIndex = 0;
             // 
-            // comboBox2
+            // cbDosen
             // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(296, 53);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(222, 24);
-            this.comboBox2.TabIndex = 1;
-            this.comboBox2.Text = "Dr. Ir. Dwijoko Purbohadi, M.T";
+            this.cbDosen.FormattingEnabled = true;
+            this.cbDosen.Location = new System.Drawing.Point(296, 53);
+            this.cbDosen.Name = "cbDosen";
+            this.cbDosen.Size = new System.Drawing.Size(222, 24);
+            this.cbDosen.TabIndex = 1;
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColTanggal,
-            this.ColNim,
-            this.ColNama,
-            this.ColStatus});
             this.dataGridView1.Location = new System.Drawing.Point(594, 32);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
@@ -75,40 +64,12 @@
             this.dataGridView1.Size = new System.Drawing.Size(555, 525);
             this.dataGridView1.TabIndex = 2;
             // 
-            // ColTanggal
+            // dtpAwal
             // 
-            this.ColTanggal.HeaderText = "Tanggal";
-            this.ColTanggal.MinimumWidth = 6;
-            this.ColTanggal.Name = "ColTanggal";
-            this.ColTanggal.Width = 125;
-            // 
-            // ColNim
-            // 
-            this.ColNim.HeaderText = "Nim";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
-            // 
-            // ColNama
-            // 
-            this.ColNama.HeaderText = "Nama";
-            this.ColNama.MinimumWidth = 6;
-            this.ColNama.Name = "ColNama";
-            this.ColNama.Width = 125;
-            // 
-            // ColStatus
-            // 
-            this.ColStatus.HeaderText = "Status";
-            this.ColStatus.MinimumWidth = 6;
-            this.ColStatus.Name = "ColStatus";
-            this.ColStatus.Width = 125;
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(37, 171);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker1.TabIndex = 3;
+            this.dtpAwal.Location = new System.Drawing.Point(37, 171);
+            this.dtpAwal.Name = "dtpAwal";
+            this.dtpAwal.Size = new System.Drawing.Size(200, 22);
+            this.dtpAwal.TabIndex = 3;
             // 
             // btnGenerate
             // 
@@ -118,13 +79,15 @@
             this.btnGenerate.TabIndex = 5;
             this.btnGenerate.Text = "Generate";
             this.btnGenerate.UseVisualStyleBackColor = true;
+            this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
             // 
-            // dateTimePicker3
+            // dtpAkhir
             // 
-            this.dateTimePicker3.Location = new System.Drawing.Point(318, 171);
-            this.dateTimePicker3.Name = "dateTimePicker3";
-            this.dateTimePicker3.Size = new System.Drawing.Size(200, 22);
-            this.dateTimePicker3.TabIndex = 6;
+            this.dtpAkhir.Location = new System.Drawing.Point(318, 171);
+            this.dtpAkhir.Name = "dtpAkhir";
+            this.dtpAkhir.Size = new System.Drawing.Size(200, 22);
+            this.dtpAkhir.TabIndex = 6;
+            this.dtpAkhir.ValueChanged += new System.EventHandler(this.dtpAkhir_ValueChanged);
             // 
             // btnKembali
             // 
@@ -143,14 +106,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1160, 592);
             this.Controls.Add(this.btnKembali);
-            this.Controls.Add(this.dateTimePicker3);
+            this.Controls.Add(this.dtpAkhir);
             this.Controls.Add(this.btnGenerate);
-            this.Controls.Add(this.dateTimePicker1);
+            this.Controls.Add(this.dtpAwal);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.cbDosen);
+            this.Controls.Add(this.cbMatakuliah);
             this.Name = "GenerateLaporan";
             this.Text = "Generate Laporan Presensi";
+            this.Load += new System.EventHandler(this.GenerateLaporan_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
@@ -158,16 +122,12 @@
 
         #endregion
 
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.ComboBox cbMatakuliah;
+        private System.Windows.Forms.ComboBox cbDosen;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker dtpAwal;
         private System.Windows.Forms.Button btnGenerate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColTanggal;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNama;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColStatus;
-        private System.Windows.Forms.DateTimePicker dateTimePicker3;
+        private System.Windows.Forms.DateTimePicker dtpAkhir;
         private System.Windows.Forms.Button btnKembali;
     }
 }

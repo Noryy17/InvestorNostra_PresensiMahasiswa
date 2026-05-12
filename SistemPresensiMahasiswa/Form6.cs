@@ -254,8 +254,6 @@ namespace SistemPresensiMahasiswa
 
         }
 
-        private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
-        {
             private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Mengizinkan: Huruf (IsLetter), Angka (IsDigit), dan Backspace (IsControl)
