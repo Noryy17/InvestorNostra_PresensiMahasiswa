@@ -61,6 +61,7 @@
             this.txtKodeMK.Name = "txtKodeMK";
             this.txtKodeMK.Size = new System.Drawing.Size(266, 22);
             this.txtKodeMK.TabIndex = 1;
+            this.txtKodeMK.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtKodeMK_KeyPress);
             // 
             // txtNamaMK
             // 
@@ -69,6 +70,7 @@
             this.txtNamaMK.Size = new System.Drawing.Size(266, 22);
             this.txtNamaMK.TabIndex = 2;
             this.txtNamaMK.UseWaitCursor = true;
+            this.txtNamaMK.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNamaMK_KeyPress);
             // 
             // btnTambah
             // 
@@ -178,6 +180,7 @@
             this.Controls.Add(this.dataGridView1);
             this.Name = "KelolaMatKul";
             this.Text = "Kelola Data Matakuliah";
+            this.Load += new System.EventHandler(this.KelolaMatKul_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

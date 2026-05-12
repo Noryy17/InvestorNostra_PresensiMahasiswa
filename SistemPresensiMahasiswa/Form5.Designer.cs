@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(KelolaMahasiswa));
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lblTotal = new System.Windows.Forms.Label();
             this.txtJurusan = new System.Windows.Forms.TextBox();
             this.mahasiswaBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.sistemPresensiDBDataSet = new SistemPresensiMahasiswa.SistemPresensiDBDataSet();
@@ -67,7 +68,6 @@
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mahasiswaTableAdapter = new SistemPresensiMahasiswa.SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter();
-            this.lblTotal = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -99,6 +99,17 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(535, 218);
             this.panel1.TabIndex = 1;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
+            // lblTotal
+            // 
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Location = new System.Drawing.Point(175, 138);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(125, 16);
+            this.lblTotal.TabIndex = 7;
+            this.lblTotal.Text = "Total Mahasiswa : 0";
+            this.lblTotal.Click += new System.EventHandler(this.lblTotal_Click);
             // 
             // txtJurusan
             // 
@@ -416,16 +427,6 @@
             // mahasiswaTableAdapter
             // 
             this.mahasiswaTableAdapter.ClearBeforeFill = true;
-            // 
-            // lblTotal
-            // 
-            this.lblTotal.AutoSize = true;
-            this.lblTotal.Location = new System.Drawing.Point(175, 138);
-            this.lblTotal.Name = "lblTotal";
-            this.lblTotal.Size = new System.Drawing.Size(125, 16);
-            this.lblTotal.TabIndex = 7;
-            this.lblTotal.Text = "Total Mahasiswa : 0";
-            this.lblTotal.Click += new System.EventHandler(this.lblTotal_Click);
             // 
             // KelolaMahasiswa
             // 

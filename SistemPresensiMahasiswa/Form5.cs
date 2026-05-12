@@ -13,7 +13,7 @@ namespace SistemPresensiMahasiswa
 
         // Connection string sudah disesuaikan dengan milik Dain
         private readonly string connectionString =
-            "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+            "Data Source=VICTUS-PUNYA-LU\\LUTFI;Initial Catalog=SistemPresensiDB;Integrated Security=True";
 
         public KelolaMahasiswa()
         {
@@ -313,6 +313,11 @@ namespace SistemPresensiMahasiswa
             {
                 lblTotal.Text = "Total Mahasiswa: -";
             }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

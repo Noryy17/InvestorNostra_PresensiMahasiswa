@@ -15,7 +15,7 @@ namespace SistemPresensiMahasiswa
     {
         private readonly SqlConnection conn;
         private readonly string connectionString =
-        "Data Source=LAPTOP-2TIS9UVD\\RIZQIHUDAYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        "Data Source=VICTUS-PUNYA-LU\\LUTFI;Initial Catalog=SistemPresensiDB;Integrated Security=True";
         public KelolaMatKul()
         {
             InitializeComponent();
@@ -248,5 +248,32 @@ namespace SistemPresensiMahasiswa
                 }
             }
         }
+
+        private void KelolaMatKul_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Mengizinkan: Huruf (IsLetter), Angka (IsDigit), dan Backspace (IsControl)
+            if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input jika itu simbol atau spasi
+                MessageBox.Show("Kode Mata Kuliah hanya boleh berisi huruf dan angka tanpa simbol!",
+                                "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void txtNamaMK_KeyPress(object sender, KeyPressEventArgs e)
+        {
+           if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true; // Batalkan input karakter tersebut
+                MessageBox.Show("Nama Mata Kuliah hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+    }
     }
 }
