@@ -1,9 +1,3 @@
--- ============================================================
---  Sistem Presensi Mahasiswa
---  Script: CreateDatabase_Updated.sql
---  Gabungan: Tables, Seed Data, View, Backup, & Stored Procedures
--- ============================================================
-
 -- 1. Membuat Database
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'SistemPresensiDB')
 BEGIN
@@ -14,9 +8,7 @@ GO
 USE SistemPresensiDB;
 GO
 
--- ========================
---  PEMBUATAN TABEL
--- ========================
+-- Membuat Tabel
 
 -- Tabel Admin
 CREATE TABLE Admin (
@@ -69,9 +61,7 @@ CREATE TABLE Presensi (
 );
 GO
 
--- ========================
---  DATA AWAL (SEED)
--- ========================
+--Data Awal
 
 INSERT INTO Admin (nama, username, password) VALUES ('Administrator', 'admin', 'admin123');
 
@@ -96,9 +86,7 @@ INSERT INTO KRS (id_mahasiswa, id_matakuliah) VALUES
     (4,2),(4,3),(5,1),(5,2),(5,3);
 GO
 
--- ============================================================
---  TAMBAHAN BARU: VIEW & BACKUP
--- ============================================================
+-- View dan backup
 
 -- Pembuatan View untuk publik
 CREATE VIEW vwMahasiswaPublic AS
@@ -116,9 +104,7 @@ GO
 SELECT * INTO Mahasiswa_Backup FROM Mahasiswa;
 GO
 
--- ============================================================
---  STORED PROCEDURES (Wajib Ada untuk Form C#)
--- ============================================================
+-- SP
 
 -- 1. SP Insert
 CREATE PROCEDURE sp_InsertMahasiswaBaru
@@ -172,3 +158,33 @@ BEGIN
     SELECT @Total = COUNT(*) FROM Mahasiswa;
 END
 GO
+
+USE SistemPresensiDB;
+GO
+
+ALTER PROCEDURE sp_DeleteMahasiswa
+    @NIM VARCHAR(20)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @id INT;
+    SELECT @id = id_mahasiswa FROM Mahasiswa WHERE nim = @NIM;
+
+    -- Hapus dulu data presensi yang terkait
+    DELETE FROM Presensi WHERE id_mahasiswa = @id;
+
+    -- Hapus juga dari KRS jika ada
+    DELETE FROM KRS WHERE id_mahasiswa = @id;
+
+    -- Baru hapus mahasiswanya
+    DELETE FROM Mahasiswa WHERE nim = @NIM;
+END
+GO
+
+ALTER PROCEDURE sp_GetMahasiswa
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT nim, nama, jurusan FROM Mahasiswa;
+END
