@@ -30,3 +30,9 @@
 
 --Menambahkan button dan fungsi test injection,reset dan binding navigator--
 <img width="1918" height="1079" alt="image" src="https://github.com/user-attachments/assets/5b1676f0-59df-4a45-bc76-e5bf6a62ec6a" />
+
+--Skenario Test sql Injection :
+<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/6fd6f606-5380-45a3-9dff-6c6af1f0c0de" />
+Mengisi form dengan ' OR 1=1 -- untuk memanipulasi kueri database sehingga perintah dianggap benar (true) hasilnya :
+<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/63f20bad-4628-4760-979a-ba73641c482f" />
+lalu reset untuk mengembalikan data semula 
