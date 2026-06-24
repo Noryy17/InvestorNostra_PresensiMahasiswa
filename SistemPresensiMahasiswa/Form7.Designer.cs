@@ -84,6 +84,7 @@
             this.Controls.Add(this.label1);
             this.Name = "DashboardDosen";
             this.Text = "DashboardDosen";
+            this.Load += new System.EventHandler(this.DashboardDosen_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

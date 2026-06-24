@@ -57,5 +57,10 @@ namespace SistemPresensiMahasiswa
             generateLaporanForm.Show();
             this.Hide();
         }
+
+        private void DashboardAdmin_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

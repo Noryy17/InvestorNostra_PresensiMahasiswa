@@ -43,6 +43,9 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
@@ -65,9 +68,8 @@
             this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mahasiswaTableAdapter = new SistemPresensiMahasiswa.SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.pictureBoxFoto = new System.Windows.Forms.PictureBox();
+            this.UploadFoto = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -75,6 +77,7 @@
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
             this.bindingNavigator1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFoto)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -97,7 +100,7 @@
             this.panel1.Controls.Add(this.label3);
             this.panel1.Location = new System.Drawing.Point(24, 57);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(535, 218);
+            this.panel1.Size = new System.Drawing.Size(366, 218);
             this.panel1.TabIndex = 1;
             // 
             // lblTotal
@@ -197,6 +200,27 @@
             this.dataGridView1.Size = new System.Drawing.Size(430, 511);
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            // 
+            // ColNim
+            // 
+            this.ColNim.HeaderText = "NIM";
+            this.ColNim.MinimumWidth = 6;
+            this.ColNim.Name = "ColNim";
+            this.ColNim.Width = 125;
+            // 
+            // ColNamaMahasiswa
+            // 
+            this.ColNamaMahasiswa.HeaderText = "Column1";
+            this.ColNamaMahasiswa.MinimumWidth = 6;
+            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
+            this.ColNamaMahasiswa.Width = 125;
+            // 
+            // ColJurusan
+            // 
+            this.ColJurusan.HeaderText = "Jurusan";
+            this.ColJurusan.MinimumWidth = 6;
+            this.ColJurusan.Name = "ColJurusan";
+            this.ColJurusan.Width = 125;
             // 
             // panel2
             // 
@@ -315,7 +339,7 @@
             this.bindingNavigator1.MovePreviousItem = this.bindingNavigatorMovePreviousItem;
             this.bindingNavigator1.Name = "bindingNavigator1";
             this.bindingNavigator1.PositionItem = this.bindingNavigatorPositionItem;
-            this.bindingNavigator1.Size = new System.Drawing.Size(1046, 31);
+            this.bindingNavigator1.Size = new System.Drawing.Size(1046, 27);
             this.bindingNavigator1.TabIndex = 10;
             this.bindingNavigator1.Text = "bindingNavigator1";
             // 
@@ -325,7 +349,7 @@
             this.bindingNavigatorAddNewItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorAddNewItem.Image")));
             this.bindingNavigatorAddNewItem.Name = "bindingNavigatorAddNewItem";
             this.bindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = true;
-            this.bindingNavigatorAddNewItem.Size = new System.Drawing.Size(29, 28);
+            this.bindingNavigatorAddNewItem.Size = new System.Drawing.Size(29, 24);
             this.bindingNavigatorAddNewItem.Text = "Add new";
             // 
             // bindingNavigatorCountItem
@@ -409,32 +433,31 @@
             // 
             this.mahasiswaTableAdapter.ClearBeforeFill = true;
             // 
-            // ColNim
+            // pictureBoxFoto
             // 
-            this.ColNim.HeaderText = "NIM";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
+            this.pictureBoxFoto.Location = new System.Drawing.Point(415, 57);
+            this.pictureBoxFoto.Name = "pictureBoxFoto";
+            this.pictureBoxFoto.Size = new System.Drawing.Size(144, 154);
+            this.pictureBoxFoto.TabIndex = 11;
+            this.pictureBoxFoto.TabStop = false;
             // 
-            // ColNamaMahasiswa
+            // UploadFoto
             // 
-            this.ColNamaMahasiswa.HeaderText = "Column1";
-            this.ColNamaMahasiswa.MinimumWidth = 6;
-            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
-            this.ColNamaMahasiswa.Width = 125;
-            // 
-            // ColJurusan
-            // 
-            this.ColJurusan.HeaderText = "Jurusan";
-            this.ColJurusan.MinimumWidth = 6;
-            this.ColJurusan.Name = "ColJurusan";
-            this.ColJurusan.Width = 125;
+            this.UploadFoto.Location = new System.Drawing.Point(435, 233);
+            this.UploadFoto.Name = "UploadFoto";
+            this.UploadFoto.Size = new System.Drawing.Size(97, 42);
+            this.UploadFoto.TabIndex = 12;
+            this.UploadFoto.Text = "UploadFoto";
+            this.UploadFoto.UseVisualStyleBackColor = true;
+            this.UploadFoto.Click += new System.EventHandler(this.UploadFoto_Click);
             // 
             // KelolaMahasiswa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1046, 580);
+            this.Controls.Add(this.UploadFoto);
+            this.Controls.Add(this.pictureBoxFoto);
             this.Controls.Add(this.bindingNavigator1);
             this.Controls.Add(this.btnInject);
             this.Controls.Add(this.btnReset);
@@ -457,6 +480,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).EndInit();
             this.bindingNavigator1.ResumeLayout(false);
             this.bindingNavigator1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFoto)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -502,5 +526,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
+        private System.Windows.Forms.PictureBox pictureBoxFoto;
+        private System.Windows.Forms.Button UploadFoto;
     }
 }

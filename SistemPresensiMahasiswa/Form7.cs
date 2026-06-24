@@ -37,5 +37,10 @@ namespace SistemPresensiMahasiswa
              Login login = new Login();
                 login.Show();
         }
+
+        private void DashboardDosen_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

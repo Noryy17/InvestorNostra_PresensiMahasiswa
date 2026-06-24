@@ -89,6 +89,7 @@
             this.Controls.Add(this.btnKelolaMahasiswa);
             this.Controls.Add(this.label1);
             this.Name = "DashboardAdmin";
+            this.Load += new System.EventHandler(this.DashboardAdmin_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
