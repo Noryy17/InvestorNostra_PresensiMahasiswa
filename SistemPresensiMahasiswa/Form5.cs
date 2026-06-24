@@ -115,10 +115,8 @@ namespace SistemPresensiMahasiswa
             {
                 conn.Open();
 
-                // =======================================================
-                // IMPLEMENTASI TCL (TRANSACTION MANAGEMENT)
-                // =======================================================
-                SqlTransaction trans = conn.BeginTransaction();
+                // Memulai transaksi DI DALAM blok using agar aman
+                SqlTransaction trans = conn.BeginTransaction();
 
                 try
                 {
@@ -129,45 +127,45 @@ namespace SistemPresensiMahasiswa
                         cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
                         cmd.Parameters.AddWithValue("@Jurusan", txtJurusan.Text);
 
-                        // =======================================================
-                        // KODE UPLOAD FOTO (BLOB) 
-                        // =======================================================
-                        if (pictureBoxFoto.Image != null)
+                        // KODE UPLOAD FOTO (BLOB)
+                        if (pictureBoxFoto.Image != null)
                         {
                             using (MemoryStream ms = new MemoryStream())
                             {
+                                // Gunakan RawFormat untuk menjaga kualitas asli
                                 pictureBoxFoto.Image.Save(ms, pictureBoxFoto.Image.RawFormat);
                                 cmd.Parameters.AddWithValue("@Foto", ms.ToArray());
                             }
                         }
                         else
                         {
-                            // Jika user tidak memilih foto, biarkan kosong di database
-                            cmd.Parameters.AddWithValue("@Foto", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Foto", DBNull.Value);
                         }
-                        // =======================================================
 
-                        cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
 
-                    trans.Commit(); // Jika semua proses (termasuk foto) sukses, simpan!
-                    MessageBox.Show("Data dan Foto berhasil ditambahkan (TCL Commit Sukses)");
+                    // Commit jika semua perintah di atas sukses
+                    trans.Commit();
+                    MessageBox.Show("Data dan Foto berhasil ditambahkan (TCL Commit Sukses)");
                 }
                 catch (SqlException sqlEx)
                 {
-                    trans.Rollback(); // Jika error, batalkan semua!
-                    SimpanLog("SQL Error Insert (Rollback): " + sqlEx.Message);
+                    // Rollback jika terjadi error database (misal: NIM sudah ada/duplikat)
+                    trans.Rollback();
+                    SimpanLog("SQL Error Insert (Rollback): " + sqlEx.Message);
                     MessageBox.Show("Gagal menyimpan data (TCL Rollback Aktif): " + sqlEx.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback(); // Jika aplikasi crash, batalkan semua!
-                    SimpanLog("App Error Insert (Rollback): " + ex.Message);
+                    // Rollback jika terjadi error aplikasi (misal: gambar rusak)
+                    trans.Rollback();
+                    SimpanLog("App Error Insert (Rollback): " + ex.Message);
                     MessageBox.Show("Terjadi kesalahan sistem (TCL Rollback Aktif): " + ex.Message, "System Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
-            LoadData();
+            LoadData(); // Refresh grid agar data baru muncul
         }
 
         private void btnUbah_Click(object sender, EventArgs e)
