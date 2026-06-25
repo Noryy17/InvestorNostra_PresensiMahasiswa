@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connection%28DAL%29.cs" />
     <Compile Include="FormCetak.cs">
       <SubType>Form</SubType>
     </Compile>
