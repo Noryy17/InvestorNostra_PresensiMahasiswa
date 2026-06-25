@@ -28,6 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.cbMatakuliah = new System.Windows.Forms.ComboBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.dtpAwal = new System.Windows.Forms.DateTimePicker();
@@ -36,7 +39,9 @@
             this.btnKembali = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.chartPresensi = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartPresensi)).BeginInit();
             this.SuspendLayout();
             // 
             // cbMatakuliah
@@ -55,7 +60,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(679, 365);
+            this.dataGridView1.Size = new System.Drawing.Size(555, 365);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
@@ -115,11 +120,28 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "Nama Matakuliah";
             // 
+            // chartPresensi
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chartPresensi.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chartPresensi.Legends.Add(legend1);
+            this.chartPresensi.Location = new System.Drawing.Point(957, 34);
+            this.chartPresensi.Name = "chartPresensi";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chartPresensi.Series.Add(series1);
+            this.chartPresensi.Size = new System.Drawing.Size(494, 365);
+            this.chartPresensi.TabIndex = 8;
+            this.chartPresensi.Text = "chart1";
+            // 
             // RekapPresensi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1066, 424);
+            this.ClientSize = new System.Drawing.Size(1479, 424);
+            this.Controls.Add(this.chartPresensi);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnKembali);
@@ -132,6 +154,7 @@
             this.Text = "FormRekapPresensi";
             this.Load += new System.EventHandler(this.FormRekapPresensi_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartPresensi)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -147,5 +170,6 @@
         private System.Windows.Forms.Button btnKembali;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartPresensi;
     }
 }

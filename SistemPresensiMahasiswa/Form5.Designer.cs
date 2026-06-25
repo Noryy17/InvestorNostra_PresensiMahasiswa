@@ -70,6 +70,9 @@
             this.mahasiswaTableAdapter = new SistemPresensiMahasiswa.SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter();
             this.pictureBoxFoto = new System.Windows.Forms.PictureBox();
             this.UploadFoto = new System.Windows.Forms.Button();
+            this.txtFilePath = new System.Windows.Forms.TextBox();
+            this.btnBrowse = new System.Windows.Forms.Button();
+            this.btnImport = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -285,7 +288,7 @@
             // btnKembali
             // 
             this.btnKembali.BackColor = System.Drawing.Color.Red;
-            this.btnKembali.Location = new System.Drawing.Point(199, 491);
+            this.btnKembali.Location = new System.Drawing.Point(12, 531);
             this.btnKembali.Name = "btnKembali";
             this.btnKembali.Size = new System.Drawing.Size(153, 37);
             this.btnKembali.TabIndex = 7;
@@ -295,7 +298,7 @@
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(146, 445);
+            this.btnReset.Location = new System.Drawing.Point(272, 477);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 8;
@@ -305,7 +308,7 @@
             // 
             // btnInject
             // 
-            this.btnInject.Location = new System.Drawing.Point(387, 445);
+            this.btnInject.Location = new System.Drawing.Point(272, 436);
             this.btnInject.Name = "btnInject";
             this.btnInject.Size = new System.Drawing.Size(75, 23);
             this.btnInject.TabIndex = 9;
@@ -451,11 +454,41 @@
             this.UploadFoto.UseVisualStyleBackColor = true;
             this.UploadFoto.Click += new System.EventHandler(this.UploadFoto_Click);
             // 
+            // txtFilePath
+            // 
+            this.txtFilePath.Location = new System.Drawing.Point(374, 436);
+            this.txtFilePath.Name = "txtFilePath";
+            this.txtFilePath.Size = new System.Drawing.Size(185, 22);
+            this.txtFilePath.TabIndex = 13;
+            // 
+            // btnBrowse
+            // 
+            this.btnBrowse.Location = new System.Drawing.Point(415, 464);
+            this.btnBrowse.Name = "btnBrowse";
+            this.btnBrowse.Size = new System.Drawing.Size(117, 24);
+            this.btnBrowse.TabIndex = 14;
+            this.btnBrowse.Text = "browse";
+            this.btnBrowse.UseVisualStyleBackColor = true;
+            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
+            // 
+            // btnImport
+            // 
+            this.btnImport.Location = new System.Drawing.Point(415, 494);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(117, 24);
+            this.btnImport.TabIndex = 15;
+            this.btnImport.Text = "Import";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            // 
             // KelolaMahasiswa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1046, 580);
+            this.Controls.Add(this.btnImport);
+            this.Controls.Add(this.btnBrowse);
+            this.Controls.Add(this.txtFilePath);
             this.Controls.Add(this.UploadFoto);
             this.Controls.Add(this.pictureBoxFoto);
             this.Controls.Add(this.bindingNavigator1);
@@ -523,10 +556,13 @@
         private System.Windows.Forms.BindingSource mahasiswaBindingSource;
         private SistemPresensiDBDataSetTableAdapters.MahasiswaTableAdapter mahasiswaTableAdapter;
         private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.PictureBox pictureBoxFoto;
+        private System.Windows.Forms.Button UploadFoto;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
-        private System.Windows.Forms.PictureBox pictureBoxFoto;
-        private System.Windows.Forms.Button UploadFoto;
+        private System.Windows.Forms.TextBox txtFilePath;
+        private System.Windows.Forms.Button btnBrowse;
+        private System.Windows.Forms.Button btnImport;
     }
 }

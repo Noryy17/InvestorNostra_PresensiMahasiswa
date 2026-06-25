@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using ExcelDataReader; // Library pembaca file Excel
 
 namespace SistemPresensiMahasiswa
 {
@@ -15,7 +17,10 @@ namespace SistemPresensiMahasiswa
         // Inisialisasi object Class Data Access Layer (DAL)
         private Connection_DAL_ db = new Connection_DAL_();
 
-        // Biarkan connection string ini sesuai dengan laptopmu (Dipakai khusus untuk transaksi internal)
+        // Variabel global untuk menampung lokasi file Excel yang dipilih
+        private string excelFilePath = "";
+
+        // Biarkan connection string ini sesuai dengan laptopmu (Dipakai khusus untuk transaksi internal & mass-insert Excel)
         private readonly string connectionString =
             "Data Source=VICTUS-PUNYA-LU\\LUTFI;Initial Catalog=SistemPresensiDB;Integrated Security=True";
 
@@ -27,7 +32,6 @@ namespace SistemPresensiMahasiswa
             try
             {
                 string queryLog = "INSERT INTO LogError (waktu, pesan_error) VALUES (GETDATE(), @pesan)";
-                // Menggunakan koneksi langsung via string khusus untuk background logging
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     using (SqlCommand cmdLog = new SqlCommand(queryLog, conn))
@@ -327,7 +331,6 @@ namespace SistemPresensiMahasiswa
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    // Kueri sengaja dibuat rentan untuk demonstrasi pengujian proteksi di hadapan Asdos
                     string query = "UPDATE Mahasiswa SET Nama='HACKED' WHERE NIM='" + txtNIM.Text + "'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -340,7 +343,6 @@ namespace SistemPresensiMahasiswa
             }
             catch (SqlException ex)
             {
-                // Trigger trg_PreventMassUpdate di SSMS akan melempar error ke blok catch ini
                 MessageBox.Show("Aktivitas Masal Ditolak Keamanan Database! \n\nDetail Pemicu: " + ex.Message, "Proteksi Trigger Aktif", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             catch (Exception ex)
@@ -414,7 +416,89 @@ namespace SistemPresensiMahasiswa
             }
         }
 
-        // Placeholder events
+        // =================================================================
+        // FITUR BARU: MANAJEMEN IMPORT FILE EXCEL (MODUL 14)
+        // =================================================================
+
+        // Event Tombol Browse File Excel
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "Excel Files|*.xlsx;*.xls";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    excelFilePath = ofd.FileName;
+                    txtFilePath.Text = excelFilePath; // Tampilkan path di TextBox yang kamu buat di UI
+                }
+            }
+        }
+
+        // Event Tombol Import Excel to Database
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(excelFilePath))
+            {
+                MessageBox.Show("Silakan pilih file Excel terlebih dahulu melalui tombol Browse!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+                using (var stream = File.Open(excelFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet(new ExcelDataSetConfiguration()
+                        {
+                            ConfigureDataTable = (_) => new ExcelDataTableConfiguration() { UseHeaderRow = true }
+                        });
+
+                        DataTable dtExcel = result.Tables[0];
+                        int barisBerhasil = 0;
+
+                        using (SqlConnection conn = new SqlConnection(connectionString))
+                        {
+                            conn.Open();
+
+                            foreach (DataRow row in dtExcel.Rows)
+                            {
+                                // Lewati pembacaan apabila baris data NIM bernilai kosong
+                                if (row[0] == DBNull.Value || string.IsNullOrEmpty(row[0].ToString())) continue;
+
+                                using (SqlCommand cmd = new SqlCommand("sp_InsertMahasiswaBaru", conn))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    // Membaca berurutan sesuai susunan file Excelmu: Index 0=NIM, 1=Nama, 2=Jurusan
+                                    cmd.Parameters.AddWithValue("@NIM", row[0].ToString());
+                                    cmd.Parameters.AddWithValue("@Nama", row[1].ToString());
+                                    cmd.Parameters.AddWithValue("@Jurusan", row[2].ToString());
+                                    cmd.Parameters.AddWithValue("@Foto", DBNull.Value); // Default kosong untuk upload massal
+
+                                    cmd.ExecuteNonQuery();
+                                    barisBerhasil++;
+                                }
+                            }
+                        }
+
+                        MessageBox.Show($"{barisBerhasil} data mahasiswa dari file Excel berhasil diimport ke database!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        // Me-refresh tabel DataGridView di layar seketika setelah import sukses
+                        LoadData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpanLog("Gagal Import Excel: " + ex.Message);
+                MessageBox.Show("Gagal melakukan import data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Placeholder events (jangan dihapus agar desainer UI tidak crash)
         private void lblTotal_Click(object sender, EventArgs e) { }
         private void textBox3_TextChanged(object sender, EventArgs e) { }
         private void txtNIM_TextChanged(object sender, EventArgs e) { }
