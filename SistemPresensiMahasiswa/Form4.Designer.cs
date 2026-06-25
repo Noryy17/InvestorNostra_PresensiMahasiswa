@@ -35,6 +35,7 @@
             this.btnGenerate = new System.Windows.Forms.Button();
             this.dtpAkhir = new System.Windows.Forms.DateTimePicker();
             this.btnKembali = new System.Windows.Forms.Button();
+            this.btnCetakLaporan = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,6 +66,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(555, 525);
             this.dataGridView1.TabIndex = 2;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // dtpAwal
             // 
@@ -102,11 +104,22 @@
             this.btnKembali.UseVisualStyleBackColor = false;
             this.btnKembali.Click += new System.EventHandler(this.btnKembali_Click);
             // 
+            // btnCetakLaporan
+            // 
+            this.btnCetakLaporan.Location = new System.Drawing.Point(37, 348);
+            this.btnCetakLaporan.Name = "btnCetakLaporan";
+            this.btnCetakLaporan.Size = new System.Drawing.Size(143, 57);
+            this.btnCetakLaporan.TabIndex = 8;
+            this.btnCetakLaporan.Text = "Cetak Laporan";
+            this.btnCetakLaporan.UseVisualStyleBackColor = true;
+            this.btnCetakLaporan.Click += new System.EventHandler(this.btnCetakLaporan_Click);
+            // 
             // GenerateLaporan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1160, 592);
+            this.Controls.Add(this.btnCetakLaporan);
             this.Controls.Add(this.btnKembali);
             this.Controls.Add(this.dtpAkhir);
             this.Controls.Add(this.btnGenerate);
@@ -131,5 +144,6 @@
         private System.Windows.Forms.Button btnGenerate;
         private System.Windows.Forms.DateTimePicker dtpAkhir;
         private System.Windows.Forms.Button btnKembali;
+        private System.Windows.Forms.Button btnCetakLaporan;
     }
 }
