@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting; // WAJIB ADA: Library pendukung komponen Chart
+using System.Windows.Forms.DataVisualization.Charting; // Library pendukung komponen Chart
 
 namespace SistemPresensiMahasiswa
 {
@@ -22,11 +22,12 @@ namespace SistemPresensiMahasiswa
             InitializeComponent();
         }
 
-        private void FormRekapPresensi_Load(object sender, EventArgs e)
+        // REVISI 1: Menyelaraskan nama event load dengan nama Form (RekapPresensi_Load)
+        private void RekapPresensi_Load(object sender, EventArgs e)
         {
             LoadMatakuliah(); // Mengisi cbMatakuliah dengan daftar pelajaran
-            dtpAwal.Value = DateTime.Now.AddMonths(-1); // Default 1 bulan terakhir
-            dtpAkhir.Value = DateTime.Now;
+            dtpAwal.Value = DateTime.Today.AddMonths(-1); // Default 1 bulan terakhir aman (tanpa komponen jam)
+            dtpAkhir.Value = DateTime.Today;
 
             // Inisialisasi awal tampilan chart agar bersih
             if (chartPresensi.Series.Count > 0) chartPresensi.Series.Clear();
@@ -38,14 +39,14 @@ namespace SistemPresensiMahasiswa
             {
                 DataTable dt = db.ExecuteStoredProcedure("sp_GetMatakuliah");
 
+                cbMatakuliah.DataSource = dt;
                 cbMatakuliah.DisplayMember = "nama_mk";
                 cbMatakuliah.ValueMember = "id_matakuliah";
-                cbMatakuliah.DataSource = dt;
-                cbMatakuliah.SelectedIndex = -1;
+                cbMatakuliah.SelectedIndex = -1; // Set default kosong agar rapi
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message);
+                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -60,7 +61,7 @@ namespace SistemPresensiMahasiswa
 
             try
             {
-                // MENGGUNAKAN DAL: Menggunakan Parameterized Query lewat array parameter untuk mencegah SQL Injection
+                // Menggunakan Parameterized Query lewat array parameter untuk mencegah SQL Injection
                 SqlParameter[] parameters = new SqlParameter[]
                 {
                     new SqlParameter("@idMK", cbMatakuliah.SelectedValue),
@@ -68,15 +69,14 @@ namespace SistemPresensiMahasiswa
                     new SqlParameter("@tglAkhir", dtpAkhir.Value.Date)
                 };
 
-                // Memanggil data rekap melalui Stored Procedure (Asumsi nama SP: sp_GetRekapPresensi)
-                // Jika di database-mu nama SP rekapnya berbeda, sesuaikan string di bawah ini:
+                // Memanggil data rekap melalui Stored Procedure
                 DataTable dt = db.ExecuteStoredProcedure("sp_GetRekapPresensi", parameters);
 
                 dataGridView1.DataSource = dt;
 
-                if (dt.Rows.Count > 0)
+                if (dt != null && dt.Rows.Count > 0)
                 {
-                    // KODE SAKTI: Gambar data statistik ke komponen Chart secara otomatis
+                    // Gambar data statistik ke komponen Chart secara otomatis
                     TampilkanGrafikPresensi(dt);
                 }
                 else
@@ -92,11 +92,10 @@ namespace SistemPresensiMahasiswa
         }
 
         // ====================================================================
-        // KODE SAKTI MODUL 14: MEMBUAT GRAFIK DARI DATA REKAP DATATABLE
+        // MEMBUAT GRAFIK DARI DATA REKAP DATATABLE (ANTI-CRASH)
         // ====================================================================
         private void TampilkanGrafikPresensi(DataTable dt)
         {
-            // 1. Hitung akumulasi total Hadir, Izin, Sakit, Alpa dari seluruh baris data mahasiswa
             int totalHadir = 0;
             int totalIzin = 0;
             int totalSakit = 0;
@@ -104,49 +103,52 @@ namespace SistemPresensiMahasiswa
 
             foreach (DataRow row in dt.Rows)
             {
-                totalHadir += Convert.ToInt32(row["Hadir"]);
-                totalIzin += Convert.ToInt32(row["Izin"]);
-                totalSakit += Convert.ToInt32(row["Sakit"]);
-                totalAlpa += Convert.ToInt32(row["Alpa"]);
+                // REVISI 2: Proteksi DBNull.Value agar program tidak crash jika ada kolom database yang kosong
+                totalHadir += row["Hadir"] != DBNull.Value ? Convert.ToInt32(row["Hadir"]) : 0;
+                totalIzin += row["Izin"] != DBNull.Value ? Convert.ToInt32(row["Izin"]) : 0;
+                totalSakit += row["Sakit"] != DBNull.Value ? Convert.ToInt32(row["Sakit"]) : 0;
+                totalAlpa += row["Alpa"] != DBNull.Value ? Convert.ToInt32(row["Alpa"]) : 0;
             }
 
-            // 2. Bersihkan grafik lama
+            // Bersihkan grafik lama
             chartPresensi.Series.Clear();
             chartPresensi.Titles.Clear();
 
-            // 3. Tambahkan Judul Grafik Resmi
-            chartPresensi.Titles.Add("Statistik Presensi Mahasiswa Kelas");
+            // Tambahkan Judul Grafik Resmi
+            chartPresensi.Titles.Add("Statistik Total Presensi Mahasiswa");
 
-            // 4. Bikin Series Data Baru bergaya diagram batang (Column)
+            // Bikin Series Data Baru bergaya diagram batang (Column)
             Series ser = new Series("Status Presensi");
-            ser.ChartType = SeriesChartType.Column; // Bisa diubah ke 'Pie' jika ingin diagram lingkaran
+            ser.ChartType = SeriesChartType.Column;
 
-            // 5. Masukkan data angka kalkulasi ke dalam grafik koordinat kartesius
+            // Masukkan data angka kalkulasi ke dalam grafik koordinat
             ser.Points.AddXY("Hadir", totalHadir);
             ser.Points.AddXY("Izin", totalIzin);
             ser.Points.AddXY("Sakit", totalSakit);
             ser.Points.AddXY("Alpa", totalAlpa);
 
-            // Beri warna dekorasi yang kontras dan rapi agar asdos terkesan
+            // Beri warna dekorasi yang kontras dan informatif
             ser.Points[0].Color = Color.MediumSeaGreen;
             ser.Points[1].Color = Color.Orange;
             ser.Points[2].Color = Color.DodgerBlue;
             ser.Points[3].Color = Color.Crimson;
 
-            // Tampilkan angka nilai di atas batang grafik
+            // Tampilkan angka nilai tepat di atas batang grafik
             ser.IsValueShownAsLabel = true;
 
-            // 6. Masukkan susunan data ke dalam kontrol UI Chart proyek
+            // Masukkan susunan data ke dalam kontrol UI Chart proyek
             chartPresensi.Series.Add(ser);
         }
 
         private void btnClear_Click(object sender, EventArgs e)
         {
             cbMatakuliah.SelectedIndex = -1;
-            dtpAwal.Value = DateTime.Now.AddMonths(-1);
-            dtpAkhir.Value = DateTime.Now;
+            dtpAwal.Value = DateTime.Today.AddMonths(-1);
+            dtpAkhir.Value = DateTime.Today;
             dataGridView1.DataSource = null;
-            if (chartPresensi.Series.Count > 0) chartPresensi.Series.Clear(); // Bersihkan juga grafik saat di-clear
+
+            if (chartPresensi.Series.Count > 0) chartPresensi.Series.Clear();
+            if (chartPresensi.Titles.Count > 0) chartPresensi.Titles.Clear();
         }
 
         private void btnKembali_Click(object sender, EventArgs e)

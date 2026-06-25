@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.DataGridView1 = new System.Windows.Forms.DataGridView();
             this.txtNIP = new System.Windows.Forms.TextBox();
             this.txtNama = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
@@ -42,19 +42,20 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btnKembali = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.btnClear = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.DataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
-            // dataGridView1
+            // DataGridView1
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(559, 12);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(539, 543);
-            this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DataGridView1.Location = new System.Drawing.Point(559, 12);
+            this.DataGridView1.Name = "DataGridView1";
+            this.DataGridView1.RowHeadersWidth = 51;
+            this.DataGridView1.RowTemplate.Height = 24;
+            this.DataGridView1.Size = new System.Drawing.Size(539, 543);
+            this.DataGridView1.TabIndex = 0;
+            this.DataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewDosen_CellContentClick);
             // 
             // txtNIP
             // 
@@ -109,7 +110,7 @@
             // 
             // btnHapus
             // 
-            this.btnHapus.Location = new System.Drawing.Point(120, 403);
+            this.btnHapus.Location = new System.Drawing.Point(120, 363);
             this.btnHapus.Name = "btnHapus";
             this.btnHapus.Size = new System.Drawing.Size(139, 55);
             this.btnHapus.TabIndex = 7;
@@ -119,7 +120,7 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(343, 403);
+            this.btnLoad.Location = new System.Drawing.Point(343, 363);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(139, 55);
             this.btnLoad.TabIndex = 8;
@@ -166,7 +167,7 @@
             // btnKembali
             // 
             this.btnKembali.BackColor = System.Drawing.Color.Red;
-            this.btnKembali.Location = new System.Drawing.Point(232, 492);
+            this.btnKembali.Location = new System.Drawing.Point(12, 514);
             this.btnKembali.Name = "btnKembali";
             this.btnKembali.Size = new System.Drawing.Size(127, 41);
             this.btnKembali.TabIndex = 15;
@@ -174,11 +175,22 @@
             this.btnKembali.UseVisualStyleBackColor = false;
             this.btnKembali.Click += new System.EventHandler(this.btnKembali_Click);
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(343, 440);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(135, 55);
+            this.btnClear.TabIndex = 16;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
             // KelolaDosen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1139, 567);
+            this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnKembali);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -192,11 +204,11 @@
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.txtNama);
             this.Controls.Add(this.txtNIP);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.DataGridView1);
             this.Name = "KelolaDosen";
             this.Text = "Kelola Akun Dosen";
             this.Load += new System.EventHandler(this.Form3_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.DataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -204,7 +216,7 @@
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView DataGridView1;
         private System.Windows.Forms.TextBox txtNIP;
         private System.Windows.Forms.TextBox txtNama;
         private System.Windows.Forms.TextBox txtUsername;
@@ -218,5 +230,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnKembali;
+        private System.Windows.Forms.Button btnClear;
     }
 }

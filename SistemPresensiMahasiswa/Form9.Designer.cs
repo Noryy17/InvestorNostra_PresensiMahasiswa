@@ -152,7 +152,6 @@
             this.Controls.Add(this.cbMatakuliah);
             this.Name = "RekapPresensi";
             this.Text = "FormRekapPresensi";
-            this.Load += new System.EventHandler(this.FormRekapPresensi_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartPresensi)).EndInit();
             this.ResumeLayout(false);

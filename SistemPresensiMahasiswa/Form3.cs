@@ -13,165 +13,129 @@ namespace SistemPresensiMahasiswa
 {
     public partial class KelolaDosen : Form
     {
-        private readonly SqlConnection conn;
-        private readonly string connectionString =
-        "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        // Memakai objek DAL yang otomatis mendeteksi IP Server dinamis
+        private Connection_DAL_ db = new Connection_DAL_();
+        private string nipAsli = "";
+
         public KelolaDosen()
         {
             InitializeComponent();
-            conn = new SqlConnection(connectionString);
         }
 
         private void Form3_Load(object sender, EventArgs e)
         {
-
+            btnLoad.PerformClick();
         }
 
         private void btnTambah_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtNIP.Text) || string.IsNullOrWhiteSpace(txtNama.Text) ||
+                string.IsNullOrWhiteSpace(txtUsername.Text) || string.IsNullOrWhiteSpace(txtPassword.Text))
+            {
+                MessageBox.Show("Semua input data dosen harus diisi!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                // Menggunakan SqlParameter untuk dikirim ke fungsi ExecuteNonQueryStoredProcedure
+                SqlParameter[] parameters = new SqlParameter[]
                 {
-                    conn.Open();
-                }
+                    new SqlParameter("@NIP", txtNIP.Text.Trim()),
+                    new SqlParameter("@Nama", txtNama.Text.Trim()),
+                    new SqlParameter("@Username", txtUsername.Text.Trim()),
+                    new SqlParameter("@Password", txtPassword.Text.Trim())
+                };
 
-                if (txtNIP.Text == "")
+                bool sukses = db.ExecuteNonQueryStoredProcedure("sp_InsertDosen", parameters);
+
+                if (sukses)
                 {
-                    MessageBox.Show("NIM harus diisi");
-                    txtNIP.Focus();
-                    return;
-                }
-
-                if (txtNama.Text == "")
-                {
-                    MessageBox.Show("Nama harus diisi");
-                    txtNama.Focus();
-                    return;
-                }
-
-                if (txtUsername.Text == "")
-                {
-                    MessageBox.Show("Kode Prodi harus diisi");
-                    txtUsername.Focus();
-                    return;
-                }
-
-                if (txtPassword.Text == "")
-                {
-                    MessageBox.Show("NIM harus diisi");
-                    txtPassword.Focus();
-                    return;
-                }
-
-                string query = "INSERT INTO Dosen " +
-                               "(nip, nama, username, password) " +
-                               "VALUES (@NIP, @Nama, @Username, @Password)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@NIP", txtNIP.Text);
-                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                cmd.Parameters.AddWithValue("@Username", txtUsername.Text);
-                cmd.Parameters.AddWithValue("@Password", txtPassword.Text);
-
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
-                {
-                    MessageBox.Show("Data Dosen berhasil ditambahkan");
+                    MessageBox.Show("Data Dosen berhasil ditambahkan", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ClearForm();
                     btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data gagal ditambahkan");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnUbah_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtNIP.Text) || string.IsNullOrEmpty(nipAsli))
+            {
+                MessageBox.Show("Silakan klik/pilih data dari tabel terlebih dahulu sebelum mengubah!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                SqlParameter[] parameters = new SqlParameter[]
                 {
-                    conn.Open();
-                }
+                    new SqlParameter("@NipBaru", txtNIP.Text.Trim()),
+                    new SqlParameter("@Nama", txtNama.Text.Trim()),
+                    new SqlParameter("@Username", txtUsername.Text.Trim()),
+                    new SqlParameter("@Password", txtPassword.Text.Trim()),
+                    new SqlParameter("@NipAsli", nipAsli)
+                };
 
-                string query = @"UPDATE Dosen
-                         SET Nama = @Nama,
-                             Username = @Username,
-                             Password = @Password
-                         WHERE NIP = @NIP";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@NIP", txtNIP.Text);
-                cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                cmd.Parameters.AddWithValue("@Username", txtUsername.Text);
-                cmd.Parameters.AddWithValue("@Password", txtPassword.Text);
-
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
+                bool sukses = db.ExecuteNonQueryStoredProcedure("sp_UpdateDosen", parameters);
+                if (sukses)
                 {
-                    MessageBox.Show("Data berhasil diupdate");
+                    MessageBox.Show("Data akun dosen berhasil diupdate", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    nipAsli = "";
                     ClearForm();
                     btnLoad.PerformClick();
                 }
                 else
                 {
-                    MessageBox.Show("Data tidak ditemukan");
+                    MessageBox.Show("Data dengan NIP tersebut tidak ditemukan atau gagal diperbarui", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnHapus_Click(object sender, EventArgs e)
         {
-            try
+            if (string.IsNullOrWhiteSpace(txtNIP.Text))
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                MessageBox.Show("Silakan pilih data dosen yang ingin dihapus dari tabel!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult resultConfirm = MessageBox.Show("Yakin ingin menghapus data dosen ini?", "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (resultConfirm == DialogResult.Yes)
+            {
+                try
                 {
-                    conn.Open();
-                }
-
-                DialogResult resultConfirm = MessageBox.Show(
-                    "Yakin ingin menghapus data?",
-                    "Konfirmasi",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (resultConfirm == DialogResult.Yes)
-                {
-                    string query = "DELETE FROM Dosen WHERE NIP = @NIP";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@NIP", txtNIP.Text);
-
-                    int result = cmd.ExecuteNonQuery();
-
-                    if (result > 0)
+                    SqlParameter[] parameters = new SqlParameter[]
                     {
-                        MessageBox.Show("Data berhasil dihapus");
+                        new SqlParameter("@NIP", txtNIP.Text.Trim())
+                    };
+
+                    bool sukses = db.ExecuteNonQueryStoredProcedure("sp_DeleteDosen", parameters);
+
+                    if (sukses)
+                    {
+                        MessageBox.Show("Data berhasil dihapus", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         ClearForm();
                         btnLoad.PerformClick();
                     }
                     else
                     {
-                        MessageBox.Show("Data tidak ditemukan");
+                        MessageBox.Show("Data tidak ditemukan", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -179,42 +143,35 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                DataGridView1.Rows.Clear();
+                DataGridView1.Columns.Clear();
+
+                DataGridView1.Columns.Add("id_dosen", "ID Dosen");
+                DataGridView1.Columns.Add("nip", "NIP");
+                DataGridView1.Columns.Add("nama", "Nama");
+                DataGridView1.Columns.Add("username", "Username");
+                DataGridView1.Columns.Add("password", "Password");
+
+                // Mengambil data tabel menggunakan ExecuteStoredProcedure dari DAL
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetAllDosen");
+
+                if (dt != null && dt.Rows.Count > 0)
                 {
-                    conn.Open();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        DataGridView1.Rows.Add(
+                            row["id_dosen"].ToString(),
+                            row["nip"].ToString(),
+                            row["nama"].ToString(),
+                            row["username"].ToString(),
+                            row["password"].ToString()
+                        );
+                    }
                 }
-
-                dataGridView1.Rows.Clear();
-                dataGridView1.Columns.Clear();
-
-                dataGridView1.Columns.Add("id_dosen", "id_dosen");
-                dataGridView1.Columns.Add("NIP", "NIP");
-                dataGridView1.Columns.Add("nama", "nama");
-                dataGridView1.Columns.Add("username", "username");
-                dataGridView1.Columns.Add("password", "password");
-
-                string query = "SELECT * FROM Dosen";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    dataGridView1.Rows.Add(
-                        reader["id_dosen"].ToString(),
-                        reader["NIP"].ToString(),
-                        reader["Nama"].ToString(),
-                        reader["Username"].ToString(),
-                        reader["Password"].ToString()
-                    );
-                }
-
-                reader.Close();
             }
-
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
+                MessageBox.Show("Gagal menampilkan data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -227,17 +184,16 @@ namespace SistemPresensiMahasiswa
             txtNIP.Focus();
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void dataGridViewDosen_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0) // make sure it's not the header row
+            if (e.RowIndex >= 0)
             {
-                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-
-                
-                txtNIP.Text = row.Cells["NIP"].Value.ToString();
-                txtNama.Text = row.Cells["Nama"].Value.ToString();
-                txtUsername.Text = row.Cells["Username"].Value.ToString();
-                txtPassword.Text = row.Cells["Password"].Value.ToString();
+                DataGridViewRow row = DataGridView1.Rows[e.RowIndex];
+                txtNIP.Text = row.Cells[1].Value?.ToString() ?? "";
+                txtNama.Text = row.Cells[2].Value?.ToString() ?? "";
+                txtUsername.Text = row.Cells[3].Value?.ToString() ?? "";
+                txtPassword.Text = row.Cells[4].Value?.ToString() ?? "";
+                nipAsli = txtNIP.Text;
             }
         }
 
@@ -250,22 +206,25 @@ namespace SistemPresensiMahasiswa
 
         private void txtNIP_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Cek apakah karakter yang ditekan bukan angka DAN bukan tombol Backspace
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
-                e.Handled = true; // Batalkan input karakter tersebut
+                e.Handled = true;
                 MessageBox.Show("NIP hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void txtNama_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Cek apakah karakter bukan huruf, bukan spasi, DAN bukan Backspace
             if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
             {
-                e.Handled = true; // Batalkan input
+                e.Handled = true;
                 MessageBox.Show("Nama hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
         }
     }
 }

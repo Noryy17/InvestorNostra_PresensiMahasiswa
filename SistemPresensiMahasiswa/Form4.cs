@@ -7,13 +7,12 @@ namespace SistemPresensiMahasiswa
 {
     public partial class GenerateLaporan : Form
     {
-        private readonly SqlConnection conn;
-        private readonly string connectionString = "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        // Memanggil Class DAL yang sudah mendukung IP dinamis multi-user
+        private Connection_DAL_ db = new Connection_DAL_();
 
         public GenerateLaporan()
         {
             InitializeComponent();
-            conn = new SqlConnection(connectionString);
         }
 
         private void GenerateLaporan_Load(object sender, EventArgs e)
@@ -21,7 +20,8 @@ namespace SistemPresensiMahasiswa
             LoadMatakuliah();
             LoadDosen();
 
-            dtpAwal.Value = DateTime.Now;
+            // Set default tanggal awal ke awal bulan Juni 2026 agar data dummy langsung otomatis terfilter
+            dtpAwal.Value = new DateTime(2026, 6, 1);
             dtpAkhir.Value = DateTime.Now;
         }
 
@@ -29,26 +29,20 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
+                // REVISI: Mengambil data lewat Stored Procedure dari objek DAL (db)
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetLookupMatakuliah");
 
-                string query = "SELECT id_matakuliah, nama_mk FROM Matakuliah";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                cbMatakuliah.DataSource = dt;
-                cbMatakuliah.DisplayMember = "nama_mk";
-                cbMatakuliah.ValueMember = "id_matakuliah";
-                cbMatakuliah.SelectedIndex = -1;
+                if (dt != null)
+                {
+                    cbMatakuliah.DataSource = dt;
+                    cbMatakuliah.DisplayMember = "nama_mk";
+                    cbMatakuliah.ValueMember = "id_matakuliah";
+                    cbMatakuliah.SelectedIndex = -1; // Kosongkan pilihan awal
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -56,26 +50,20 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
+                // REVISI: Mengambil data lewat Stored Procedure dari objek DAL (db)
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetLookupDosen");
 
-                string query = "SELECT id_dosen, nama FROM Dosen";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                cbDosen.DataSource = dt;
-                cbDosen.DisplayMember = "nama";
-                cbDosen.ValueMember = "id_dosen";
-                cbDosen.SelectedIndex = -1;
+                if (dt != null)
+                {
+                    cbDosen.DataSource = dt;
+                    cbDosen.DisplayMember = "nama";
+                    cbDosen.ValueMember = "id_dosen";
+                    cbDosen.SelectedIndex = -1; // Kosongkan pilihan awal
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat daftar dosen: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal memuat daftar dosen: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -84,29 +72,28 @@ namespace SistemPresensiMahasiswa
         // =========================================================
         private void btnGenerate_Click(object sender, EventArgs e)
         {
+            // Validasi: Cegah error null jika combobox belum dipilih user
+            if (cbMatakuliah.SelectedValue == null || cbDosen.SelectedValue == null)
+            {
+                MessageBox.Show("Silakan pilih Mata Kuliah dan Dosen terlebih dahulu!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
+                // REVISI: Susun parameter array untuk dikirim secara aman ke DAL
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@idMK", cbMatakuliah.SelectedValue),
+                    new SqlParameter("@idDosen", cbDosen.SelectedValue),
+                    new SqlParameter("@tglAwal", dtpAwal.Value.Date),
+                    new SqlParameter("@tglAkhir", dtpAkhir.Value.Date)
+                };
 
-                string query = @"SELECT p.tanggal, m.nim, m.nama, p.status 
-                                 FROM Presensi p
-                                 INNER JOIN Mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
-                                 WHERE p.id_matakuliah = @idMK 
-                                 AND p.id_dosen = @idDosen 
-                                 AND p.tanggal BETWEEN @tglAwal AND @tglAkhir";
+                // REVISI: Jalankan SP pengambil laporan data presensi
+                DataTable dt = db.ExecuteStoredProcedure("sp_GenerateLaporanPresensi", parameters);
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@idMK", cbMatakuliah.SelectedValue);
-                cmd.Parameters.AddWithValue("@idDosen", cbDosen.SelectedValue);
-                cmd.Parameters.AddWithValue("@tglAwal", dtpAwal.Value.Date);
-                cmd.Parameters.AddWithValue("@tglAkhir", dtpAkhir.Value.Date);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                if (dt.Rows.Count > 0)
+                if (dt != null && dt.Rows.Count > 0)
                 {
                     dataGridView1.DataSource = dt;
                     dataGridView1.Columns["tanggal"].HeaderText = "Tanggal";
@@ -117,16 +104,12 @@ namespace SistemPresensiMahasiswa
                 else
                 {
                     dataGridView1.DataSource = null;
-                    MessageBox.Show("Tidak ada data presensi yang ditemukan.");
+                    MessageBox.Show("Tidak ada data presensi yang ditemukan untuk filter tersebut.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Terjadi kesalahan saat memuat laporan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -135,7 +118,6 @@ namespace SistemPresensiMahasiswa
         // =========================================================
         private void btnCetakLaporan_Click(object sender, EventArgs e)
         {
-            // 1. Pastikan user sudah milih combobox sebelum cetak
             if (cbMatakuliah.SelectedValue == null || cbDosen.SelectedValue == null)
             {
                 MessageBox.Show("Pilih Mata Kuliah dan Dosen terlebih dahulu sebelum mencetak!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -144,25 +126,24 @@ namespace SistemPresensiMahasiswa
 
             try
             {
-                // 2. Ambil filter yang dipilih user
                 int idMk = Convert.ToInt32(cbMatakuliah.SelectedValue);
                 int idDsn = Convert.ToInt32(cbDosen.SelectedValue);
                 DateTime tglMulai = dtpAwal.Value.Date;
                 DateTime tglSelesai = dtpAkhir.Value.Date;
 
-                // 3. Buka FormCetak (Crystal Report) dan kirim filter datanya ke sana
+                // Buka FormCetak Crystal Report
                 FormCetak frmCetak = new FormCetak(idMk, idDsn, tglMulai, tglSelesai);
                 frmCetak.Show();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal membuka halaman cetak: " + ex.Message);
+                MessageBox.Show("Gagal membuka halaman cetak: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void dtpAkhir_ValueChanged(object sender, EventArgs e)
         {
-            if (dtpAkhir.Value < dtpAwal.Value)
+            if (dtpAkhir.Value.Date < dtpAwal.Value.Date)
             {
                 MessageBox.Show("Tanggal akhir tidak boleh lebih kecil dari tanggal awal!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 dtpAkhir.Value = dtpAwal.Value;
@@ -178,7 +159,7 @@ namespace SistemPresensiMahasiswa
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Biarkan kosong, ini dibutuhkan oleh desain form
+            // Dibutuhkan oleh Windows Form Designer
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using ExcelDataReader; // Library pembaca file Excel
+using ExcelDataReader;
 
 namespace SistemPresensiMahasiswa
 {
@@ -14,36 +14,25 @@ namespace SistemPresensiMahasiswa
         private BindingSource bindingSource = new BindingSource();
         private DataTable dtMahasiswa = new DataTable();
 
-        // Inisialisasi object Class Data Access Layer (DAL)
+        // Memanggil Class DAL tersentralisasi untuk menghapus dependensi connectionString
         private Connection_DAL_ db = new Connection_DAL_();
-
-        // Variabel global untuk menampung lokasi file Excel yang dipilih
         private string excelFilePath = "";
 
-        // Biarkan connection string ini sesuai dengan laptopmu (Dipakai khusus untuk transaksi internal & mass-insert Excel)
-        private readonly string connectionString =
-            "Data Source=VICTUS-PUNYA-LU\\LUTFI;Initial Catalog=SistemPresensiDB;Integrated Security=True";
-
-        // =================================================================
-        // METHOD LOGGING (Berdasarkan Modul Praktikum 11)
-        // =================================================================
         private void SimpanLog(string pesanError)
         {
             try
             {
-                string queryLog = "INSERT INTO LogError (waktu, pesan_error) VALUES (GETDATE(), @pesan)";
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // PERBAIKAN: Disarankan menggunakan Stored Procedure untuk log demi keamanan arsitektur DAL
+                SqlParameter[] parameters = new SqlParameter[]
                 {
-                    using (SqlCommand cmdLog = new SqlCommand(queryLog, conn))
-                    {
-                        cmdLog.Parameters.AddWithValue("@pesan", pesanError);
-                        conn.Open();
-                        cmdLog.ExecuteNonQuery();
-                    }
-                }
+                    new SqlParameter("@pPesan", pesanError)
+                };
+
+                db.ExecuteNonQueryStoredProcedure("sp_InsertLogError", parameters);
             }
             catch
-            { // Di-ignore agar tidak memicu loop exception jika log gagal 
+            {
+                // Di-ignore aman jika koneksi bermasalah
             }
         }
 
@@ -52,7 +41,7 @@ namespace SistemPresensiMahasiswa
             InitializeComponent();
         }
 
-        private void KelolaMahasiswa_Load_1(object sender, EventArgs e)
+        private void KelolaMahasiswa_Load(object sender, EventArgs e)
         {
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.MultiSelect = false;
@@ -66,7 +55,7 @@ namespace SistemPresensiMahasiswa
 
             bindingNavigator1.BindingSource = bindingSource;
 
-            // Hubungkan event ketika baris data berubah agar foto ikut ter-refresh
+            // Otomatis update foto setiap kali baris/posisi data bergeser
             bindingSource.PositionChanged += BindingSource_PositionChanged;
 
             LoadData();
@@ -76,20 +65,19 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                // MENGGUNAKAN DAL: Memanggil sp_GetMahasiswa tanpa menulis ulang SqlConnection manual
                 dtMahasiswa = db.ExecuteStoredProcedure("sp_GetMahasiswa");
 
                 bindingSource.DataSource = dtMahasiswa;
                 dataGridView1.DataSource = bindingSource;
 
                 BindControls();
-                TampilkanFotoMahasiswa(); // Update tampilan foto untuk baris pertama
+                TampilkanFotoMahasiswa();
                 HitungTotal();
             }
             catch (Exception ex)
             {
                 SimpanLog("Gagal Load Data: " + ex.Message);
-                MessageBox.Show("Gagal load data: " + ex.Message);
+                MessageBox.Show("Gagal load data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -104,7 +92,6 @@ namespace SistemPresensiMahasiswa
             txtJurusan.DataBindings.Add("Text", bindingSource, "jurusan");
         }
 
-        // Method pendukung untuk memunculkan gambar dari data biner (BLOB) database
         private void TampilkanFotoMahasiswa()
         {
             try
@@ -114,20 +101,28 @@ namespace SistemPresensiMahasiswa
                     DataRowView currentView = (DataRowView)bindingSource.Current;
                     DataRow row = currentView.Row;
 
-                    // Memeriksa apakah kolom foto tersedia di DataTable dan tidak bernilai NULL
                     if (dtMahasiswa.Columns.Contains("foto") && row["foto"] != DBNull.Value)
                     {
                         byte[] imgBytes = (byte[])row["foto"];
                         using (MemoryStream ms = new MemoryStream(imgBytes))
                         {
                             pictureBoxFoto.SizeMode = PictureBoxSizeMode.Zoom;
-                            pictureBoxFoto.Image = Image.FromStream(ms);
+
+                            // Bungkus dengan new Bitmap agar tidak mengunci stream asli
+                            using (Image tempImg = Image.FromStream(ms))
+                            {
+                                pictureBoxFoto.Image = new Bitmap(tempImg);
+                            }
                         }
                     }
                     else
                     {
-                        pictureBoxFoto.Image = null; // Kosongkan box jika mahasiswa tidak punya foto
+                        pictureBoxFoto.Image = null;
                     }
+                }
+                else
+                {
+                    pictureBoxFoto.Image = null;
                 }
             }
             catch (Exception ex)
@@ -149,143 +144,107 @@ namespace SistemPresensiMahasiswa
 
         private void btnTambah_Click(object sender, EventArgs e)
         {
-            if (txtNIM.Text == "") { MessageBox.Show("NIM harus diisi"); txtNIM.Focus(); return; }
-            if (txtNama.Text == "") { MessageBox.Show("Nama harus diisi"); txtNama.Focus(); return; }
-            if (txtJurusan.Text == "") { MessageBox.Show("Jurusan harus diisi"); txtJurusan.Focus(); return; }
+            if (string.IsNullOrEmpty(txtNIM.Text)) { MessageBox.Show("NIM harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning); txtNIM.Focus(); return; }
+            if (string.IsNullOrEmpty(txtNama.Text)) { MessageBox.Show("Nama harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning); txtNama.Focus(); return; }
+            if (string.IsNullOrEmpty(txtJurusan.Text)) { MessageBox.Show("Jurusan harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning); txtJurusan.Focus(); return; }
 
-            // Menggunakan transaksi manual di tombol ini (Sesuai syarat TCL di UCP)
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                SqlTransaction trans = conn.BeginTransaction();
-
-                try
-                {
-                    using (SqlCommand cmd = new SqlCommand("sp_InsertMahasiswaBaru", conn, trans))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@NIM", txtNIM.Text);
-                        cmd.Parameters.AddWithValue("@Nama", txtNama.Text);
-                        cmd.Parameters.AddWithValue("@Jurusan", txtJurusan.Text);
-
-                        // KODE UPLOAD FOTO (BLOB)
-                        if (pictureBoxFoto.Image != null)
-                        {
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                pictureBoxFoto.Image.Save(ms, pictureBoxFoto.Image.RawFormat);
-                                cmd.Parameters.AddWithValue("@Foto", ms.ToArray());
-                            }
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@Foto", DBNull.Value);
-                        }
-
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    trans.Commit();
-                    MessageBox.Show("Data dan Foto berhasil ditambahkan! (TCL Commit Sukses)", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (SqlException sqlEx)
-                {
-                    trans.Rollback();
-                    SimpanLog("SQL Error Insert (Rollback): " + sqlEx.Message);
-                    MessageBox.Show("Gagal menyimpan data (TCL Rollback Aktif): \n" + sqlEx.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    SimpanLog("App Error Insert (Rollback): " + ex.Message);
-                    MessageBox.Show("Terjadi kesalahan sistem (TCL Rollback Aktif): " + ex.Message, "System Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            LoadData();
-        }
-
-        private void btnUbah_Click(object sender, EventArgs e)
-        {
             try
             {
-                // Konversi foto baru jika ada perubahan
-                byte[] fotoBlob = null;
+                object fotoParamValue = DBNull.Value;
+
                 if (pictureBoxFoto.Image != null)
                 {
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        pictureBoxFoto.Image.Save(ms, pictureBoxFoto.Image.RawFormat);
-                        fotoBlob = ms.ToArray();
+                        pictureBoxFoto.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        fotoParamValue = ms.ToArray();
                     }
                 }
 
-                // MENGGUNAKAN DAL: Menyusun parameter secara terstruktur dan aman dari SQL Injection
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@NIM", txtNIM.Text),
-                    new SqlParameter("@Nama", txtNama.Text),
-                    new SqlParameter("@Jurusan", txtJurusan.Text),
-                    new SqlParameter("@Foto", (object)fotoBlob ?? DBNull.Value)
+                    new SqlParameter("@pNIM", txtNIM.Text.Trim()),
+                    new SqlParameter("@pNama", txtNama.Text.Trim()),
+                    new SqlParameter("@pJurusan", txtJurusan.Text.Trim()),
+                    new SqlParameter("@pFoto", fotoParamValue)
                 };
 
-                bool isSuccess = db.ExecuteNonQueryStoredProcedure("sp_UpdateMahasiswa", parameters);
+                db.ExecuteNonQueryStoredProcedure("sp_InsertMahasiswaBaru", parameters);
 
-                if (isSuccess)
-                {
-                    MessageBox.Show("Data dan Foto Mahasiswa berhasil diperbarui!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadData();
-                }
-                else
-                {
-                    MessageBox.Show("Gagal memperbarui data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            catch (SqlException sqlEx)
-            {
-                SimpanLog("SQL Error Update: " + sqlEx.Message);
-                MessageBox.Show("Gagal mengupdate data: " + sqlEx.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Data dan Foto berhasil ditambahkan!", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadData();
+                ClearForm();
             }
             catch (Exception ex)
             {
-                SimpanLog("App Error Update: " + ex.Message);
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SimpanLog("Error Insert: " + ex.Message);
+                MessageBox.Show("Gagal menyimpan data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnUbah_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtNIM.Text) || string.IsNullOrEmpty(txtNama.Text) || string.IsNullOrEmpty(txtJurusan.Text))
+            {
+                MessageBox.Show("NIM, Nama, dan Jurusan tidak boleh kosong!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                byte[] fotoBytes = null;
+                if (pictureBoxFoto.Image != null)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        Bitmap bmp = new Bitmap(pictureBoxFoto.Image);
+                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        fotoBytes = ms.ToArray();
+                    }
+                }
+
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                     new SqlParameter("@pNIM", txtNIM.Text.Trim()),
+                     new SqlParameter("@pNama", txtNama.Text.Trim()),
+                     new SqlParameter("@pJurusan", txtJurusan.Text.Trim()),
+                     new SqlParameter("@pFoto", (object)fotoBytes ?? DBNull.Value)
+                };
+
+                db.ExecuteNonQueryStoredProcedure("sp_UpdateMahasiswa", parameters);
+                MessageBox.Show("Data mahasiswa berhasil diperbarui!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal memperbarui data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnHapus_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtNIM.Text)) return;
+
             try
             {
                 DialogResult resultConfirm = MessageBox.Show(
                     "Yakin ingin menghapus data mahasiswa ini? Seluruh riwayat presensi terkait juga akan terhapus.",
-                    "Konfirmasi Hapus",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                    "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (resultConfirm == DialogResult.Yes)
                 {
-                    // MENGGUNAKAN DAL: Pemanggilan SP Delete secara ringkas
-                    SqlParameter[] parameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@NIM", txtNIM.Text)
-                    };
-
+                    SqlParameter[] parameters = new SqlParameter[] { new SqlParameter("@pNIM", txtNIM.Text) };
                     db.ExecuteNonQueryStoredProcedure("sp_DeleteMahasiswa", parameters);
 
-                    MessageBox.Show("Data berhasil dihapus dari sistem.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Data berhasil dihapus.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadData();
+                    ClearForm();
                 }
-            }
-            catch (SqlException sqlEx)
-            {
-                SimpanLog("SQL Error Delete: " + sqlEx.Message);
-                MessageBox.Show("Gagal menghapus data: " + sqlEx.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                SimpanLog("App Error Delete: " + ex.Message);
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SimpanLog("Error Delete: " + ex.Message);
+                MessageBox.Show("Gagal menghapus data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -293,30 +252,13 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                string query = @"
-                IF OBJECT_ID('dbo.Mahasiswa_Backup') IS NOT NULL
-                BEGIN
-                    DELETE FROM dbo.Presensi;
-                    DELETE FROM dbo.KRS;
-                    DELETE FROM dbo.Mahasiswa;
-
-                    SET IDENTITY_INSERT dbo.Mahasiswa ON;
-                    INSERT INTO dbo.Mahasiswa (id_mahasiswa, nim, nama, jurusan)
-                    SELECT id_mahasiswa, nim, nama, jurusan FROM dbo.Mahasiswa_Backup;
-                    SET IDENTITY_INSERT dbo.Mahasiswa OFF;
-                END";
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                DialogResult confirm = MessageBox.Show("Yakin ingin mereset data ke cadangan semula?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (confirm == DialogResult.Yes)
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
+                    db.ExecuteNonQueryStoredProcedure("sp_ResetData", new SqlParameter[] { });
+                    MessageBox.Show("Data berhasil direset ke cadangan semula.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
                 }
-
-                MessageBox.Show("Data berhasil direset ke kondisi cadangan semula.", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadData();
             }
             catch (Exception ex)
             {
@@ -328,26 +270,16 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string query = "UPDATE Mahasiswa SET Nama='HACKED' WHERE NIM='" + txtNIM.Text + "'";
+                // PERBAIKAN: Hindari raw text SQL jika DAL mewajibkan Stored Procedure
+                SqlParameter[] parameters = new SqlParameter[] { new SqlParameter("@pNIM", txtNIM.Text) };
+                db.ExecuteNonQueryStoredProcedure("sp_SimulasiHackedNama", parameters);
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        int result = cmd.ExecuteNonQuery();
-                        MessageBox.Show(result + " baris terupdate. Sistem Anda ternyata rentan SQL Injection!", "Eksperimen SQLi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                }
+                MessageBox.Show("Eksperimen selesai.", "Eksperimen SQLi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 LoadData();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Aktivitas Masal Ditolak Keamanan Database! \n\nDetail Pemicu: " + ex.Message, "Proteksi Trigger Aktif", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Aktivitas Ditolak Keamanan Database! \n\nDetail: " + ex.Message, "Proteksi Aktif", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
 
@@ -355,35 +287,33 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                SqlParameter outputParam = new SqlParameter("@pCount", SqlDbType.Int)
                 {
-                    using (SqlCommand cmd = new SqlCommand("sp_CountMahasiswa", conn))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
+                    Direction = ParameterDirection.Output
+                };
 
-                        SqlParameter outputParam = new SqlParameter("@Total", SqlDbType.Int);
-                        outputParam.Direction = ParameterDirection.Output;
-                        cmd.Parameters.Add(outputParam);
+                SqlParameter[] parameters = new SqlParameter[] { outputParam };
+                db.ExecuteNonQueryStoredProcedure("sp_CountMahasiswa", parameters);
 
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-
-                        lblTotal.Text = "Total Mahasiswa: " + outputParam.Value.ToString();
-                    }
+                if (outputParam.Value != DBNull.Value && outputParam.Value != null)
+                {
+                    lblTotal.Text = "Total Mahasiswa: " + outputParam.Value.ToString();
+                }
+                else
+                {
+                    lblTotal.Text = "Total Mahasiswa: 0";
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                SimpanLog("Error HitungTotal: " + ex.Message);
                 lblTotal.Text = "Total Mahasiswa: -";
             }
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
-            {
-                bindingSource.Position = e.RowIndex;
-            }
+            // Sinkronisasi murni diatur aman oleh BindingSource_PositionChanged
         }
 
         private void btnKembali_Click(object sender, EventArgs e)
@@ -407,7 +337,6 @@ namespace SistemPresensiMahasiswa
             using (OpenFileDialog opnfd = new OpenFileDialog())
             {
                 opnfd.Filter = "Image Files (*.jpg;*.jpeg;*.png;)|*.jpg;*.jpeg;*.png;";
-
                 if (opnfd.ShowDialog() == DialogResult.OK)
                 {
                     pictureBoxFoto.SizeMode = PictureBoxSizeMode.Zoom;
@@ -416,11 +345,6 @@ namespace SistemPresensiMahasiswa
             }
         }
 
-        // =================================================================
-        // FITUR BARU: MANAJEMEN IMPORT FILE EXCEL (MODUL 14)
-        // =================================================================
-
-        // Event Tombol Browse File Excel
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
@@ -429,24 +353,22 @@ namespace SistemPresensiMahasiswa
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     excelFilePath = ofd.FileName;
-                    txtFilePath.Text = excelFilePath; // Tampilkan path di TextBox yang kamu buat di UI
+                    txtFilePath.Text = excelFilePath;
                 }
             }
         }
 
-        // Event Tombol Import Excel to Database
         private void btnImport_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(excelFilePath))
             {
-                MessageBox.Show("Silakan pilih file Excel terlebih dahulu melalui tombol Browse!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Silakan pilih file Excel melalui tombol Browse!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             try
             {
                 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
                 using (var stream = File.Open(excelFilePath, FileMode.Open, FileAccess.Read))
                 {
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
@@ -458,35 +380,34 @@ namespace SistemPresensiMahasiswa
 
                         DataTable dtExcel = result.Tables[0];
                         int barisBerhasil = 0;
+                        int barisGagal = 0;
 
-                        using (SqlConnection conn = new SqlConnection(connectionString))
+                        foreach (DataRow row in dtExcel.Rows)
                         {
-                            conn.Open();
+                            if (row[0] == DBNull.Value || string.IsNullOrEmpty(row[0].ToString())) continue;
 
-                            foreach (DataRow row in dtExcel.Rows)
+                            try
                             {
-                                // Lewati pembacaan apabila baris data NIM bernilai kosong
-                                if (row[0] == DBNull.Value || string.IsNullOrEmpty(row[0].ToString())) continue;
-
-                                using (SqlCommand cmd = new SqlCommand("sp_InsertMahasiswaBaru", conn))
+                                // PERBAIKAN: Parameter disamakan memakai '@p' sesuai sp_InsertMahasiswaBaru
+                                SqlParameter[] parameters = new SqlParameter[]
                                 {
-                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    new SqlParameter("@pNIM", row[0].ToString().Trim()),
+                                    new SqlParameter("@pNama", row[1].ToString().Trim()),
+                                    new SqlParameter("@pJurusan", row[2].ToString().Trim()),
+                                    new SqlParameter("@pFoto", DBNull.Value)
+                                };
 
-                                    // Membaca berurutan sesuai susunan file Excelmu: Index 0=NIM, 1=Nama, 2=Jurusan
-                                    cmd.Parameters.AddWithValue("@NIM", row[0].ToString());
-                                    cmd.Parameters.AddWithValue("@Nama", row[1].ToString());
-                                    cmd.Parameters.AddWithValue("@Jurusan", row[2].ToString());
-                                    cmd.Parameters.AddWithValue("@Foto", DBNull.Value); // Default kosong untuk upload massal
-
-                                    cmd.ExecuteNonQuery();
-                                    barisBerhasil++;
-                                }
+                                db.ExecuteNonQueryStoredProcedure("sp_InsertMahasiswaBaru", parameters);
+                                barisBerhasil++;
+                            }
+                            catch
+                            {
+                                // Jika ada row yang duplikat NIM-nya, skip dan lanjut ke baris berikutnya
+                                barisGagal++;
                             }
                         }
 
-                        MessageBox.Show($"{barisBerhasil} data mahasiswa dari file Excel berhasil diimport ke database!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Me-refresh tabel DataGridView di layar seketika setelah import sukses
+                        MessageBox.Show($"{barisBerhasil} data berhasil diimport. Gagal/Duplikat: {barisGagal}", "Hasil Import", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadData();
                     }
                 }
@@ -498,13 +419,33 @@ namespace SistemPresensiMahasiswa
             }
         }
 
-        // Placeholder events (jangan dihapus agar desainer UI tidak crash)
-        private void lblTotal_Click(object sender, EventArgs e) { }
-        private void textBox3_TextChanged(object sender, EventArgs e) { }
-        private void txtNIM_TextChanged(object sender, EventArgs e) { }
-        private void panel1_Paint(object sender, PaintEventArgs e) { }
-        private void txtNIM_KeyPress(object sender, KeyPressEventArgs e) { }
-        private void txtNama_KeyPress(object sender, KeyPressEventArgs e) { }
-        private void txtJurusan_KeyPress(object sender, KeyPressEventArgs e) { }
+        private void txtNIM_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtNama_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtJurusan_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
     }
 }

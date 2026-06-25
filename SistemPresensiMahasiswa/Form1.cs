@@ -13,18 +13,17 @@ namespace SistemPresensiMahasiswa
 {
     public partial class Login : Form
     {
-        private readonly SqlConnection conn;
-        private readonly string connectionString =
-        "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        // REVISI 1: Gunakan class Connection_DAL_ sebagai pusat kendali query database (Otomatis memakai IP dinamis)
+        private Connection_DAL_ db = new Connection_DAL_();
+
         public Login()
         {
             InitializeComponent();
-            conn = new SqlConnection(connectionString);
         }
 
         private void FormLogin_Load(object sender, EventArgs e)
         {
-
+            // Kosmetik form saat pertama kali dimuat jika perlu
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -32,66 +31,67 @@ namespace SistemPresensiMahasiswa
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text.Trim();
 
+            // Validasi Input Kosong (UX Improvement)
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Username dan Password tidak boleh kosong!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                conn.Open();
-
-                // Cek apakah user adalah Admin
-                string queryAdmin = "SELECT * FROM Admin WHERE username=@username AND password=@password";
-                using (SqlCommand cmdAdmin = new SqlCommand(queryAdmin, conn))
+                // REVISI 2: Siapkan susunan parameter SQL untuk dikirim ke DAL
+                SqlParameter[] parameters = new SqlParameter[]
                 {
-                    cmdAdmin.Parameters.AddWithValue("@username", username);
-                    cmdAdmin.Parameters.AddWithValue("@password", password);
+                    new SqlParameter("@username", username),
+                    new SqlParameter("@password", password)
+                };
 
-                    SqlDataReader readerAdmin = cmdAdmin.ExecuteReader();
-                    if (readerAdmin.HasRows)
-                    {
-                        // Login sebagai Admin
-                        readerAdmin.Close();
-                        conn.Close();
+                // --- CEK LOGIN ADMIN VIA STORED PROCEDURE ---
+                DataTable dtAdmin = db.ExecuteStoredProcedure("sp_LoginAdmin", parameters);
 
-                        DashboardAdmin dashAdmin = new DashboardAdmin();
-                        dashAdmin.Show();
-                        this.Hide();
-                        return;
-                    }
-                    readerAdmin.Close();
+                if (dtAdmin != null && dtAdmin.Rows.Count > 0)
+                {
+                    // Login sukses sebagai Admin
+                    DashboardAdmin dashAdmin = new DashboardAdmin();
+                    dashAdmin.Show();
+                    this.Hide();
+                    return;
                 }
 
-                // Cek apakah user adalah Dosen
-                string queryDosen = "SELECT * FROM Dosen WHERE username=@username AND password=@password";
-                using (SqlCommand cmdDosen = new SqlCommand(queryDosen, conn))
+                // REVISI 3: Re-instansiasi ulang parameter agar bersih saat digunakan kembali untuk query kedua
+                parameters = new SqlParameter[]
                 {
-                    cmdDosen.Parameters.AddWithValue("@username", username);
-                    cmdDosen.Parameters.AddWithValue("@password", password);
+                    new SqlParameter("@username", username),
+                    new SqlParameter("@password", password)
+                };
 
-                    SqlDataReader readerDosen = cmdDosen.ExecuteReader();
-                    if (readerDosen.HasRows)
-                    {
-                        // Login sebagai Dosen
-                        readerDosen.Close();
-                        conn.Close();
+                // --- CEK LOGIN DOSEN VIA STORED PROCEDURE ---
+                DataTable dtDosen = db.ExecuteStoredProcedure("sp_LoginDosen", parameters);
 
-                        DashboardDosen dashDosen = new DashboardDosen();
-                        dashDosen.Show();
-                        this.Hide();
-                        return;
-                    }
-                    readerDosen.Close();
+                if (dtDosen != null && dtDosen.Rows.Count > 0)
+                {
+                    // Login sukses sebagai Dosen
+                    DashboardDosen dashDosen = new DashboardDosen();
+                    dashDosen.Show();
+                    this.Hide();
+                    return;
                 }
 
-                conn.Close();
+                // Jika kedua pengecekan di atas terlewati (tidak ada data matching)
                 MessageBox.Show("Username atau password salah!", "Login Gagal", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPassword.Clear();
+                txtUsername.Focus();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan sistem: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void PanelCard_Paint(object sender, PaintEventArgs e)
         {
-
+            // Tempat kustomisasi grafis panel jika ada
         }
     }
 }

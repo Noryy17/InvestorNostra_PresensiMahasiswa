@@ -40,6 +40,7 @@
             this.txtSKS = new System.Windows.Forms.TextBox();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnKembali = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -84,7 +85,7 @@
             // 
             // btnHapus
             // 
-            this.btnHapus.Location = new System.Drawing.Point(81, 346);
+            this.btnHapus.Location = new System.Drawing.Point(81, 312);
             this.btnHapus.Name = "btnHapus";
             this.btnHapus.Size = new System.Drawing.Size(86, 39);
             this.btnHapus.TabIndex = 5;
@@ -142,7 +143,7 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(253, 346);
+            this.btnLoad.Location = new System.Drawing.Point(253, 312);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(82, 39);
             this.btnLoad.TabIndex = 11;
@@ -153,7 +154,7 @@
             // btnKembali
             // 
             this.btnKembali.BackColor = System.Drawing.Color.Red;
-            this.btnKembali.Location = new System.Drawing.Point(302, 457);
+            this.btnKembali.Location = new System.Drawing.Point(12, 537);
             this.btnKembali.Name = "btnKembali";
             this.btnKembali.Size = new System.Drawing.Size(99, 40);
             this.btnKembali.TabIndex = 12;
@@ -161,11 +162,22 @@
             this.btnKembali.UseVisualStyleBackColor = false;
             this.btnKembali.Click += new System.EventHandler(this.btnKembali_Click);
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(173, 381);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(82, 39);
+            this.btnClear.TabIndex = 13;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
             // KelolaMatKul
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(967, 589);
+            this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnKembali);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.txtSKS);
@@ -201,5 +213,6 @@
         private System.Windows.Forms.TextBox txtSKS;
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.Button btnKembali;
+        private System.Windows.Forms.Button btnClear;
     }
 }

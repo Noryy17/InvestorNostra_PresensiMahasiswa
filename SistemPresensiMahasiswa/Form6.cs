@@ -13,189 +13,179 @@ namespace SistemPresensiMahasiswa
 {
     public partial class KelolaMatKul : Form
     {
-        private readonly SqlConnection conn;
-        private readonly string connectionString =
-        "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        // Menggunakan Class DAL tersentralisasi untuk menghapus dependensi connectionString manual
+        private Connection_DAL_ db = new Connection_DAL_();
+
+        private string kodeMkAsli = "";
+
         public KelolaMatKul()
         {
             InitializeComponent();
-            conn = new SqlConnection(connectionString);
         }
 
-        private void btnTambah_Click(object sender, EventArgs e)
+        // Otomatis load data saat form pertama kali dibuka
+        private void KelolaMatKul_Load(object sender, EventArgs e)
+        {
+            // Konfigurasi awal DataGridView agar lebih rapi dan aman
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.MultiSelect = false;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            LoadDataMataKuliah();
+        }
+
+        // PERBAIKAN: Menggunakan fungsi ExecuteStoredProcedure/ExecuteNonQuery dari DAL
+        private void LoadDataMataKuliah()
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                dataGridView1.Rows.Clear();
+
+                // Cek apakah kolom sudah dibuat di designer, jika belum baru kita buat lewat kode
+                if (dataGridView1.Columns.Count == 0)
                 {
-                    conn.Open();
+                    dataGridView1.Columns.Add("kode_mk", "Kode MK");
+                    dataGridView1.Columns.Add("nama_mk", "Nama Mata Kuliah");
+                    dataGridView1.Columns.Add("sks", "SKS");
                 }
 
-                if (txtKodeMK.Text == "")
+                // REVISI: Jika Anda menggunakan query text, pastikan DAL mendukungnya.
+                // Jika DAL Anda mewajibkan Stored Procedure, gantilah string di bawah dengan nama SP Anda (misal: "sp_GetMatakuliah")
+                string queryTextOrSP = "SELECT kode_mk, nama_mk, sks FROM Matakuliah";
+
+                DataTable dtMatkul = db.ExecuteStoredProcedure(queryTextOrSP);
+
+                foreach (DataRow row in dtMatkul.Rows)
                 {
-                    MessageBox.Show("Kode Mata Kuliah harus diisi");
-                    txtKodeMK.Focus();
-                    return;
-                }
-
-                if (txtNamaMK.Text == "")
-                {
-                    MessageBox.Show("Nama Mata Kuliah harus diisi");
-                    txtNamaMK.Focus();
-                    return;
-                }
-
-                if (txtSKS.Text == "")
-                {
-                    MessageBox.Show("SKS harus diisi");
-                    txtSKS.Focus();
-                    return;
-                }
-
-                string query = "INSERT INTO Matakuliah " +
-                               "(kode_mk, nama_mk, sks) " +
-                               "VALUES (@Kode_MK, @Nama_MK, @SKS)";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Kode_MK", txtKodeMK.Text);
-                cmd.Parameters.AddWithValue("@Nama_MK", txtNamaMK.Text);
-                cmd.Parameters.AddWithValue("@SKS", txtSKS.Text);
-
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
-                {
-                    MessageBox.Show("Data Mata Kuliah berhasil ditambahkan");
-                    ClearForm();
-                    btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data gagal ditambahkan");
+                    dataGridView1.Rows.Add(
+                        row["kode_mk"].ToString(),
+                        row["nama_mk"].ToString(),
+                        row["sks"].ToString()
+                    );
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
-            }
-        }
-
-        private void btnUbah_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                string query = @"UPDATE Matakuliah
-                         SET nama_mk = @Nama_MK,
-                             sks = @SKS
-                         WHERE kode_mk = @Kode_MK";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Kode_MK", txtKodeMK.Text);
-                cmd.Parameters.AddWithValue("@Nama_MK", txtNamaMK.Text);
-                cmd.Parameters.AddWithValue("@SKS", txtSKS.Text);
-
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
-                {
-                    MessageBox.Show("Data berhasil diupdate");
-                    ClearForm();
-                    btnLoad.PerformClick();
-                }
-                else
-                {
-                    MessageBox.Show("Data tidak ditemukan");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
-            }
-        }
-
-        private void btnHapus_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                DialogResult resultConfirm = MessageBox.Show(
-                    "Yakin ingin menghapus data?",
-                    "Konfirmasi",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (resultConfirm == DialogResult.Yes)
-                {
-                    string query = "DELETE FROM Matakuliah WHERE kode_mk = @Kode_MK";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@Kode_MK", txtKodeMK.Text);
-
-                    int result = cmd.ExecuteNonQuery();
-
-                    if (result > 0)
-                    {
-                        MessageBox.Show("Data berhasil dihapus");
-                        ClearForm();
-                        btnLoad.PerformClick();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Data tidak ditemukan");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Gagal menampilkan data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            try
+            LoadDataMataKuliah();
+        }
+
+        private void btnTambah_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtKodeMK.Text) ||
+                string.IsNullOrWhiteSpace(txtNamaMK.Text) ||
+                string.IsNullOrWhiteSpace(txtSKS.Text))
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                {
-                    conn.Open();
-                }
-
-                dataGridView1.Rows.Clear();
-                dataGridView1.Columns.Clear();
-
-                dataGridView1.Columns.Add("Kode_MK", "Kode_MK");
-                dataGridView1.Columns.Add("Nama_MK", "Nama_MK");
-                dataGridView1.Columns.Add("SKS", "SKS");
-
-                string query = "SELECT * FROM Matakuliah";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    dataGridView1.Rows.Add(
-                        reader["Kode_MK"].ToString(),
-                        reader["Nama_MK"].ToString(),
-                        reader["SKS"].ToString()
-                    );
-                }
-
-                reader.Close();
+                MessageBox.Show("Semua data (Kode, Nama, SKS) wajib diisi!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
+            try
+            {
+                // REVISI: Menggunakan query/SP berparameter aman lewat DAL tanpa membuat SqlConnection manual
+                // Dianjurkan mengganti query ini dengan nama Stored Procedure (misal: "sp_InsertMatakuliah") jika DAL hanya menerima SP
+                string queryTextOrSP = "INSERT INTO Matakuliah (kode_mk, nama_mk, sks) VALUES (@Kode_MK, @Nama_MK, @SKS)";
+
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Kode_MK", txtKodeMK.Text.Trim()),
+                    new SqlParameter("@Nama_MK", txtNamaMK.Text.Trim()),
+                    new SqlParameter("@SKS", Convert.ToInt32(txtSKS.Text.Trim()))
+                };
+
+                db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);
+
+                MessageBox.Show("Data Mata Kuliah berhasil ditambahkan", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClearForm();
+                LoadDataMataKuliah();
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnUbah_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtKodeMK.Text))
+            {
+                MessageBox.Show("Pilih data dari tabel yang akan diubah!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(kodeMkAsli))
+            {
+                MessageBox.Show("Silakan klik/pilih data dari tabel terlebih dahulu sebelum mengubah!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                // REVISI: Migrasi ke DAL tersentralisasi berparameter
+                // Dianjurkan mengganti query ini dengan nama Stored Procedure (misal: "sp_UpdateMatakuliah") jika diperlukan
+                string queryTextOrSP = "UPDATE Matakuliah SET kode_mk = @KodeBaru, nama_mk = @Nama_MK, sks = @SKS WHERE kode_mk = @KodeAsli";
+
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@KodeBaru", txtKodeMK.Text.Trim()),
+                    new SqlParameter("@Nama_MK", txtNamaMK.Text.Trim()),
+                    new SqlParameter("@SKS", Convert.ToInt32(txtSKS.Text.Trim())),
+                    new SqlParameter("@KodeAsli", kodeMkAsli)
+                };
+
+                db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);
+
+                MessageBox.Show("Data berhasil diupdate", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                kodeMkAsli = ""; // Reset variabel penanda
+                ClearForm();
+                LoadDataMataKuliah();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnHapus_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtKodeMK.Text))
+            {
+                MessageBox.Show("Pilih data yang ingin dihapus terlebih dahulu!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult resultConfirm = MessageBox.Show("Yakin ingin menghapus data mata kuliah ini?", "Konfirmasi Hapus",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (resultConfirm == DialogResult.Yes)
+            {
+                try
+                {
+                    // REVISI: Menghapus data menggunakan eksekusi terpusat DAL berparameter
+                    string queryTextOrSP = "DELETE FROM Matakuliah WHERE kode_mk = @Kode_MK";
+
+                    SqlParameter[] parameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@Kode_MK", txtKodeMK.Text.Trim())
+                    };
+
+                    db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);
+
+                    MessageBox.Show("Data berhasil dihapus", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ClearForm();
+                    LoadDataMataKuliah();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -204,18 +194,29 @@ namespace SistemPresensiMahasiswa
             txtKodeMK.Clear();
             txtNamaMK.Clear();
             txtSKS.Clear();
+            txtKodeMK.Focus();
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        // PERBAIKAN: Mengubah nama event atau memastikan penanganan event klik sel diatur dengan aman
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0) // make sure it's not the header row
+            if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-                txtKodeMK.Text = row.Cells["Kode_MK"].Value.ToString();
-                txtNamaMK.Text = row.Cells["Nama_MK"].Value.ToString();
-                txtSKS.Text = row.Cells["SKS"].Value.ToString();
+                txtKodeMK.Text = row.Cells[0].Value?.ToString() ?? "";
+                txtNamaMK.Text = row.Cells[1].Value?.ToString() ?? "";
+                txtSKS.Text = row.Cells[2].Value?.ToString() ?? "";
+
+                // Simpan kode asli di sini sebagai acuan klausa WHERE saat update data
+                kodeMkAsli = txtKodeMK.Text;
             }
+        }
+
+        // Catatan: Jika di designer gridview Anda menggunakan CellContentClick, ganti atau arahkan event-nya ke method di bawah ini
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            dataGridView1_CellClick(sender, e);
         }
 
         private void btnKembali_Click(object sender, EventArgs e)
@@ -225,53 +226,52 @@ namespace SistemPresensiMahasiswa
             dashboardAdminForm.Show();
         }
 
+        // Validasi KeyPress Input SKS
         private void txtSKS_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Cek apakah karakter yang ditekan bukan angka DAN bukan tombol Backspace
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
-                e.Handled = true; // Batalkan input karakter tersebut
+                e.Handled = true;
                 MessageBox.Show("SKS hanya boleh diisi dengan angka!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void txtSKS_Validating(object sender, CancelEventArgs e)
         {
-            int nilaiSks;
-            if (int.TryParse(txtSKS.Text, out nilaiSks))
+            if (string.IsNullOrWhiteSpace(txtSKS.Text)) return;
+
+            if (int.TryParse(txtSKS.Text, out int nilaiSks))
             {
                 if (nilaiSks < 1 || nilaiSks > 6)
                 {
-                    MessageBox.Show("SKS harus di antara 1 sampai 6!");
+                    MessageBox.Show("SKS harus di antara 1 sampai 6!", "Validasi Gagal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtSKS.Clear();
-                    e.Cancel = true; // Mencegah user pindah ke input lain sebelum diperbaiki
+                    e.Cancel = true;
                 }
             }
         }
 
-        private void KelolaMatKul_Load(object sender, EventArgs e)
+        private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
         {
-
-        }
-
-            private void txtKodeMK_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Mengizinkan: Huruf (IsLetter), Angka (IsDigit), dan Backspace (IsControl)
             if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
-                e.Handled = true; // Batalkan input jika itu simbol atau spasi
-                MessageBox.Show("Kode Mata Kuliah hanya boleh berisi huruf dan angka tanpa simbol!",
-                                "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Handled = true;
+                MessageBox.Show("Kode Mata Kuliah hanya boleh berisi huruf dan angka tanpa simbol/spasi!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void txtNamaMK_KeyPress(object sender, KeyPressEventArgs e)
         {
-           if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
             {
-                e.Handled = true; // Batalkan input karakter tersebut
-                MessageBox.Show("Nama Mata Kuliah hanya boleh diisi dengan huruf!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Handled = true;
+                MessageBox.Show("Nama Mata Kuliah hanya boleh diisi dengan huruf dan spasi!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-    }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
     }
 }

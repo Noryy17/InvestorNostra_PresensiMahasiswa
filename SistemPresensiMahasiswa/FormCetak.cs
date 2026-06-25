@@ -9,22 +9,23 @@ namespace SistemPresensiMahasiswa
 {
     public partial class FormCetak : Form
     {
-        private readonly string connectionString = "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
+        // REVISI 1: Konsisten menggunakan DAL sebagai pusat kendali query database
+        private Connection_DAL_ db = new Connection_DAL_();
 
-        // Variabel untuk menyimpan parameter filter dari Form4
+        // Variabel penampung parameter filter
         private int _idMatakuliah;
         private int _idDosen;
         private DateTime _tglAwal;
         private DateTime _tglAkhir;
 
-        // Constructor ini menerima parameter dari Form4
+        // Constructor menerima parameter filter dari form pemicu (Form4 / Admin)
         public FormCetak(int idMatakuliah, int idDosen, DateTime tglAwal, DateTime tglAkhir)
         {
             InitializeComponent();
             _idMatakuliah = idMatakuliah;
             _idDosen = idDosen;
-            _tglAwal = tglAwal;
-            _tglAkhir = tglAkhir;
+            _tglAwal = tglAwal.Date; // Ambil tanggalnya saja (00:00:00)
+            _tglAkhir = tglAkhir.Date.AddDays(1).AddTicks(-1); // Set ke akhir hari (23:59:59) agar data di hari terakhir ikut tercetak
         }
 
         private void FormCetak_Load(object sender, EventArgs e)
@@ -36,68 +37,54 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // REVISI 2: Menyusun parameter query SQL Injection Protection via DAL
+                SqlParameter[] parameters = new SqlParameter[]
                 {
-                    conn.Open();
+                    new SqlParameter("@idMK", _idMatakuliah),
+                    new SqlParameter("@idDosen", _idDosen),
+                    new SqlParameter("@tglAwal", _tglAwal),
+                    new SqlParameter("@idAkhir", _tglAkhir) // Mengikuti nama parameter tglAkhir
+                };
+                // Perbaikan typo nama parameter agar sinkron dengan query string
+                parameters[3].ParameterName = "@tglAkhir";
 
-                    // Query untuk mengambil data berdasarkan filter
-                    string query = @"SELECT p.tanggal AS Tanggal, 
-                                            m.nim AS NIM, 
-                                            m.nama AS NamaMahasiswa, 
-                                            mk.nama_mk AS NamaMatakuliah, 
-                                            d.nama AS NamaDosen, 
-                                            p.status AS Status 
-                                     FROM Presensi p
-                                     INNER JOIN Mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
-                                     INNER JOIN Matakuliah mk ON p.id_matakuliah = mk.id_matakuliah
-                                     INNER JOIN Dosen d ON p.id_dosen = d.id_dosen
-                                     WHERE p.id_matakuliah = @idMK 
-                                     AND p.id_dosen = @idDosen 
-                                     AND p.tanggal BETWEEN @tglAwal AND @tglAkhir";
+                // Eksekusi query via fungsi yang ada di class DAL Anda
+                // Catatan: Jika di DAL menggunakan query text biasa, pastikan memanggil fungsi eksekusi text (misal: ExecuteQueryText), 
+                // jika menggunakan stored procedure, ganti query string di atas dengan nama SP-nya.
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetLaporanPresensi", parameters);
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    // Konversi DataTable ke List Object Data Source Crystal Report
+                    List<LaporanPresensiData> listData = new List<LaporanPresensiData>();
+
+                    foreach (DataRow row in dt.Rows)
                     {
-                        cmd.Parameters.AddWithValue("@idMK", _idMatakuliah);
-                        cmd.Parameters.AddWithValue("@idDosen", _idDosen);
-                        cmd.Parameters.AddWithValue("@tglAwal", _tglAwal);
-                        cmd.Parameters.AddWithValue("@tglAkhir", _tglAkhir);
-
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        DataTable dt = new DataTable();
-                        da.Fill(dt);
-
-                        if (dt.Rows.Count > 0)
+                        listData.Add(new LaporanPresensiData
                         {
-                            // Konversi DataTable ke List object
-                            List<LaporanPresensiData> listData = new List<LaporanPresensiData>();
-
-                            foreach (DataRow row in dt.Rows)
-                            {
-                                listData.Add(new LaporanPresensiData
-                                {
-                                    Tanggal = Convert.ToDateTime(row["Tanggal"]),
-                                    NIM = row["NIM"].ToString(),
-                                    NamaMahasiswa = row["NamaMahasiswa"].ToString(),
-                                    NamaMatakuliah = row["NamaMatakuliah"].ToString(),
-                                    NamaDosen = row["NamaDosen"].ToString(),
-                                    Status = row["Status"].ToString()
-                                });
-                            }
-
-                            // Load Crystal Report
-                            LaporanPresensi rpt = new LaporanPresensi();
-                            rpt.SetDataSource(listData);
-
-                            // Tampilkan di Viewer
-                            crystalReportViewer1.ReportSource = rpt;
-                            crystalReportViewer1.Refresh();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Tidak ada data presensi yang ditemukan untuk kriteria ini.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            this.Close(); // Tutup form cetak jika tidak ada data
-                        }
+                            Tanggal = Convert.ToDateTime(row["Tanggal"]),
+                            NIM = row["NIM"].ToString(),
+                            NamaMahasiswa = row["NamaMahasiswa"].ToString(),
+                            NamaMatakuliah = row["NamaMatakuliah"].ToString(),
+                            NamaDosen = row["NamaDosen"].ToString(),
+                            Status = row["Status"].ToString()
+                        });
                     }
+
+                    // REVISI 3: Proteksi inisialisasi file rpt
+                    ReportDocument rpt = new ReportDocument();
+                    // Load report langsung dari file rpt proyek agar aman dari masalah caching assembly
+                    rpt.Load(Application.StartupPath + @"\LaporanPresensi.rpt");
+                    rpt.SetDataSource(listData);
+
+                    // Tampilkan ke dalam komponen Crystal Report Viewer di UI
+                    crystalReportViewer1.ReportSource = rpt;
+                    crystalReportViewer1.Refresh();
+                }
+                else
+                {
+                    MessageBox.Show("Tidak ada data presensi yang ditemukan untuk kriteria ini.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
                 }
             }
             catch (Exception ex)

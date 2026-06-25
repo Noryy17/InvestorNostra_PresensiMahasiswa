@@ -11,18 +11,32 @@ using System.Windows.Forms;
 
 namespace SistemPresensiMahasiswa
 {
-
-    
     public partial class InputPresensi : Form
     {
+        // Menggunakan arsitektur DAL yang sudah terpusat
+        private Connection_DAL_ db = new Connection_DAL_();
 
-        private readonly SqlConnection conn;
-        private readonly string connectionString =
-        "Data Source=LAPTOP-DSPPD9L7\\FAIDARYA;Initial Catalog=SistemPresensiDB;Integrated Security=True";
         public InputPresensi()
         {
             InitializeComponent();
-            conn = new SqlConnection(connectionString);
+        }
+
+        private void InputPresensi_Load(object sender, EventArgs e)
+        {
+            // Mengisi pilihan Status secara manual sesuai aturan CHECK di database
+            cbStatus.Items.Clear();
+            cbStatus.Items.Add("Hadir");
+            cbStatus.Items.Add("Izin");
+            cbStatus.Items.Add("Sakit");
+            cbStatus.Items.Add("Alpa");
+
+            // Memuat semua komponen data master ke ComboBox via DAL
+            LoadMatakuliah();
+            LoadDosen();
+            LoadMahasiswa();
+
+            // Tampilkan data tabel presensi saat form pertama kali dibuka
+            RefreshTable();
         }
 
         private void btnKembali_Click(object sender, EventArgs e)
@@ -36,28 +50,17 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                    conn.Open();
-
-                // Ambil id_dosen untuk sistem dan nama untuk tampilan
-                string query = "SELECT id_dosen, nama FROM Dosen";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                // Menggunakan Stored Procedure sp_GetLookupDosen yang sudah Anda buat di database
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetLookupDosen", null);
 
                 cbDosen.DataSource = dt;
-                cbDosen.DisplayMember = "nama";   // Menampilkan "Dr. Budi Santoso", dsb.
-                cbDosen.ValueMember = "id_dosen"; // Menyimpan angka ID (1, 2, dst.)
-
-                cbDosen.SelectedIndex = -1; // Agar awalnya kosong
+                cbDosen.DisplayMember = "nama";
+                cbDosen.ValueMember = "id_dosen";
+                cbDosen.SelectedIndex = -1; // Default kosong
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat daftar dosen: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal memuat daftar dosen: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -65,76 +68,44 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                    conn.Open();
+                // Menggunakan Stored Procedure sp_GetLookupMatakuliah yang sudah Anda buat di database
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetLookupMatakuliah", null);
 
-                // Ambil ID untuk nilai sistem, dan Nama untuk tampilan user
-                string query = "SELECT id_matakuliah, nama_mk FROM Matakuliah";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                // Menghubungkan ComboBox dengan DataTable
                 cbMatakuliah.DataSource = dt;
-
-                // Apa yang dilihat oleh user di layar
                 cbMatakuliah.DisplayMember = "nama_mk";
-
-                // Apa yang dikirim ke database saat klik 'Generate' (ID-nya)
                 cbMatakuliah.ValueMember = "id_matakuliah";
-
-                // Agar ComboBox tidak langsung memilih item pertama saat form terbuka (opsional)
-                cbMatakuliah.SelectedIndex = -1;
+                cbMatakuliah.SelectedIndex = -1; // Default kosong
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal memuat mata kuliah: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void LoadMahasiswa()
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
-                    conn.Open();
+                // Menggunakan Stored Procedure sp_GetMahasiswa untuk memuat data Dropdown
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetMahasiswa", null);
 
-                // Ambil ID untuk nilai sistem, dan Nama untuk tampilan user
-                string query = "SELECT id_mahasiswa, nama FROM Mahasiswa";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                // Menghubungkan ComboBox dengan DataTable
                 cbMahasiswa.DataSource = dt;
-
-                // Apa yang dilihat oleh user di layar
                 cbMahasiswa.DisplayMember = "nama";
 
-                // Apa yang dikirim ke database saat klik 'Generate' (ID-nya)
-                cbMahasiswa.ValueMember = "id_mahasiswa";
-
-                // Agar ComboBox tidak langsung memilih item pertama saat form terbuka (opsional)
-                cbMahasiswa.SelectedIndex = -1;
+                // PENTING: Karena di sp_GetMahasiswa terakhir Anda hanya mengambil (nim, nama, jurusan),
+                // maka value member kita arahkan ke NIM, atau sesuaikan dengan relasi di database Anda.
+                cbMahasiswa.ValueMember = "nim";
+                cbMahasiswa.SelectedIndex = -1; // Default kosong
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal memuat mahasiswa: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal memuat mahasiswa: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnInput_Click(object sender, EventArgs e)
         {
-            // 1. Validasi: Pastikan tidak ada yang kosong
+            // Validasi: Pastikan tidak ada kolom pilihan yang terlewat
             if (cbMatakuliah.SelectedValue == null || cbDosen.SelectedValue == null ||
                 cbMahasiswa.SelectedValue == null || cbStatus.SelectedItem == null)
             {
@@ -144,85 +115,65 @@ namespace SistemPresensiMahasiswa
 
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed) conn.Open();
+                // Menyiapkan parameter sesuai dengan SP di database
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@tanggal", dtpTanggal.Value.Date),
+                    new SqlParameter("@status", cbStatus.SelectedItem.ToString()),
+                    new SqlParameter("@id_mhs", Convert.ToInt32(cbMahasiswa.SelectedValue)),
+                    new SqlParameter("@id_mk", Convert.ToInt32(cbMatakuliah.SelectedValue)),
+                    new SqlParameter("@id_dosen", Convert.ToInt32(cbDosen.SelectedValue))
+                };
 
-                // 2. Query Insert sesuai tabel Screenshot 2026-05-12 210145.png
-                string query = @"INSERT INTO Presensi (tanggal, status, id_mahasiswa, id_matakuliah, id_dosen) 
-                         VALUES (@tanggal, @status, @id_mhs, @id_mk, @id_dosen)";
+                // PERBAIKAN 1: Ubah tipe data dari 'int' menjadi 'bool'
+                bool result = db.ExecuteNonQueryStoredProcedure("sp_InsertPresensi", parameters);
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                // Mengambil nilai dari kontrol
-                cmd.Parameters.AddWithValue("@tanggal", dtpTanggal.Value.Date);
-                cmd.Parameters.AddWithValue("@status", cbStatus.SelectedItem.ToString());
-                cmd.Parameters.AddWithValue("@id_mhs", cbMahasiswa.SelectedValue);
-                cmd.Parameters.AddWithValue("@id_mk", cbMatakuliah.SelectedValue);
-                cmd.Parameters.AddWithValue("@id_dosen", cbDosen.SelectedValue);
-
-                int result = cmd.ExecuteNonQuery();
-
-                if (result > 0)
+                // PERBAIKAN 2: Cek langsung kondisi bool-nya (jika true berarti sukses)
+                if (result)
                 {
                     MessageBox.Show("Presensi berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    RefreshTable(); // Fungsi untuk memperbarui tampilan DataGridView
+                    btnClearForm_Click(sender, e);
+                    RefreshTable();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal menyimpan data: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                MessageBox.Show("Gagal menyimpan data ke database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                try
+                {
+                    SqlParameter[] logParams = new SqlParameter[] { new SqlParameter("@pPesan", ex.Message) };
+                    db.ExecuteStoredProcedure("sp_InsertLogError", logParams);
+                }
+                catch { }
             }
         }
-
         private void RefreshTable()
         {
             try
             {
-                // Query untuk menampilkan data terbaru (menggabungkan Nama Mahasiswa agar mudah dibaca)
-                string query = @"SELECT p.tanggal, m.nim, m.nama, p.status 
-                         FROM Presensi p 
-                         JOIN Mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa 
-                         ORDER BY p.id_presensi DESC"; // Data terbaru di atas
+                // Menampilkan riwayat data terbaru melalui DAL
+                string query = @"SELECT p.tanggal AS [Tanggal], m.nim AS [NIM], m.nama AS [Nama Mahasiswa], p.status AS [Status] 
+                                 FROM Presensi p 
+                                 JOIN Mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa 
+                                 ORDER BY p.tanggal DESC, m.nim ASC";
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                DataTable dt = db.ExecuteStoredProcedure(query, null);
                 dataGridView1.DataSource = dt;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error Refresh: " + ex.Message);
+                Console.WriteLine("Error Refresh Table: " + ex.Message);
             }
-        }
-        private void InputPresensi_Load(object sender, EventArgs e)
-        {
-            LoadMatakuliah();
-            LoadDosen();
-            LoadMahasiswa(); // Buat fungsi serupa untuk mengambil data mahasiswa
-
-            // Mengisi pilihan Status secara manual sesuai aturan CHECK di database
-            cbStatus.Items.Clear();
-            cbStatus.Items.Add("Hadir");
-            cbStatus.Items.Add("Izin");
-            cbStatus.Items.Add("Sakit");
-            cbStatus.Items.Add("Alpa");
         }
 
         private void btnClearForm_Click(object sender, EventArgs e)
         {
-            // Mengembalikan ComboBox ke posisi tidak memilih apapun
             cbMatakuliah.SelectedIndex = -1;
             cbDosen.SelectedIndex = -1;
             cbMahasiswa.SelectedIndex = -1;
             cbStatus.SelectedIndex = -1;
-
-            // Mengembalikan tanggal ke hari ini
-            dtpTanggal.Value = DateTime.Now;
-
-            // Memberikan fokus kembali ke input pertama agar user bisa langsung mulai lagi
+            dtpTanggal.Value = DateTime.Today;
             cbMatakuliah.Focus();
         }
     }

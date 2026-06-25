@@ -46,6 +46,7 @@
             this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Foto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
@@ -73,6 +74,7 @@
             this.txtFilePath = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -114,7 +116,6 @@
             this.lblTotal.Size = new System.Drawing.Size(125, 16);
             this.lblTotal.TabIndex = 7;
             this.lblTotal.Text = "Total Mahasiswa : 0";
-            this.lblTotal.Click += new System.EventHandler(this.lblTotal_Click);
             // 
             // txtJurusan
             // 
@@ -195,7 +196,8 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColNim,
             this.ColNamaMahasiswa,
-            this.ColJurusan});
+            this.ColJurusan,
+            this.Foto});
             this.dataGridView1.Location = new System.Drawing.Point(585, 57);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
@@ -213,7 +215,7 @@
             // 
             // ColNamaMahasiswa
             // 
-            this.ColNamaMahasiswa.HeaderText = "Column1";
+            this.ColNamaMahasiswa.HeaderText = "Nama";
             this.ColNamaMahasiswa.MinimumWidth = 6;
             this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
             this.ColNamaMahasiswa.Width = 125;
@@ -225,8 +227,17 @@
             this.ColJurusan.Name = "ColJurusan";
             this.ColJurusan.Width = 125;
             // 
+            // Foto
+            // 
+            this.Foto.DataPropertyName = "Foto";
+            this.Foto.HeaderText = "Foto";
+            this.Foto.MinimumWidth = 6;
+            this.Foto.Name = "Foto";
+            this.Foto.Width = 125;
+            // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.btnClear);
             this.panel2.Controls.Add(this.btnLoad);
             this.panel2.Controls.Add(this.btnHapus);
             this.panel2.Controls.Add(this.btnUbah);
@@ -238,7 +249,7 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(411, 29);
+            this.btnLoad.Location = new System.Drawing.Point(435, 31);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(97, 40);
             this.btnLoad.TabIndex = 3;
@@ -248,7 +259,7 @@
             // 
             // btnHapus
             // 
-            this.btnHapus.Location = new System.Drawing.Point(292, 29);
+            this.btnHapus.Location = new System.Drawing.Point(228, 29);
             this.btnHapus.Name = "btnHapus";
             this.btnHapus.Size = new System.Drawing.Size(97, 40);
             this.btnHapus.TabIndex = 2;
@@ -258,7 +269,7 @@
             // 
             // btnUbah
             // 
-            this.btnUbah.Location = new System.Drawing.Point(162, 29);
+            this.btnUbah.Location = new System.Drawing.Point(122, 29);
             this.btnUbah.Name = "btnUbah";
             this.btnUbah.Size = new System.Drawing.Size(100, 40);
             this.btnUbah.TabIndex = 1;
@@ -268,7 +279,7 @@
             // 
             // btnTambah
             // 
-            this.btnTambah.Location = new System.Drawing.Point(36, 29);
+            this.btnTambah.Location = new System.Drawing.Point(14, 29);
             this.btnTambah.Name = "btnTambah";
             this.btnTambah.Size = new System.Drawing.Size(102, 40);
             this.btnTambah.TabIndex = 0;
@@ -481,6 +492,16 @@
             this.btnImport.UseVisualStyleBackColor = true;
             this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(331, 29);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(97, 40);
+            this.btnClear.TabIndex = 4;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
             // KelolaMahasiswa
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -503,7 +524,6 @@
             this.Controls.Add(this.label1);
             this.Name = "KelolaMahasiswa";
             this.Text = "Kelola Data Mahasiswa";
-            this.Load += new System.EventHandler(this.KelolaMahasiswa_Load_1);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).EndInit();
@@ -558,11 +578,13 @@
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.PictureBox pictureBoxFoto;
         private System.Windows.Forms.Button UploadFoto;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
         private System.Windows.Forms.TextBox txtFilePath;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Foto;
+        private System.Windows.Forms.Button btnClear;
     }
 }
