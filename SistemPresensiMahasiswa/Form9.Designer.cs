@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.cbMatakuliah = new System.Windows.Forms.ComboBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.dtpAwal = new System.Windows.Forms.DateTimePicker();
@@ -122,16 +122,16 @@
             // 
             // chartPresensi
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chartPresensi.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chartPresensi.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            this.chartPresensi.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chartPresensi.Legends.Add(legend3);
             this.chartPresensi.Location = new System.Drawing.Point(957, 34);
             this.chartPresensi.Name = "chartPresensi";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chartPresensi.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chartPresensi.Series.Add(series3);
             this.chartPresensi.Size = new System.Drawing.Size(494, 365);
             this.chartPresensi.TabIndex = 8;
             this.chartPresensi.Text = "chart1";
@@ -152,6 +152,7 @@
             this.Controls.Add(this.cbMatakuliah);
             this.Name = "RekapPresensi";
             this.Text = "FormRekapPresensi";
+            this.Load += new System.EventHandler(this.RekapPresensi_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartPresensi)).EndInit();
             this.ResumeLayout(false);

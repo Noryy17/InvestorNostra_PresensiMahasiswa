@@ -43,11 +43,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Foto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnClear = new System.Windows.Forms.Button();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnHapus = new System.Windows.Forms.Button();
             this.btnUbah = new System.Windows.Forms.Button();
@@ -74,7 +71,10 @@
             this.txtFilePath = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
-            this.btnClear = new System.Windows.Forms.Button();
+            this.ColNim = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColNamaMahasiswa = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColJurusan = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Foto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mahasiswaBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sistemPresensiDBDataSet)).BeginInit();
@@ -206,35 +206,6 @@
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
-            // ColNim
-            // 
-            this.ColNim.HeaderText = "NIM";
-            this.ColNim.MinimumWidth = 6;
-            this.ColNim.Name = "ColNim";
-            this.ColNim.Width = 125;
-            // 
-            // ColNamaMahasiswa
-            // 
-            this.ColNamaMahasiswa.HeaderText = "Nama";
-            this.ColNamaMahasiswa.MinimumWidth = 6;
-            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
-            this.ColNamaMahasiswa.Width = 125;
-            // 
-            // ColJurusan
-            // 
-            this.ColJurusan.HeaderText = "Jurusan";
-            this.ColJurusan.MinimumWidth = 6;
-            this.ColJurusan.Name = "ColJurusan";
-            this.ColJurusan.Width = 125;
-            // 
-            // Foto
-            // 
-            this.Foto.DataPropertyName = "Foto";
-            this.Foto.HeaderText = "Foto";
-            this.Foto.MinimumWidth = 6;
-            this.Foto.Name = "Foto";
-            this.Foto.Width = 125;
-            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.btnClear);
@@ -246,6 +217,16 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(535, 100);
             this.panel2.TabIndex = 4;
+            // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(331, 29);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(97, 40);
+            this.btnClear.TabIndex = 4;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
             // btnLoad
             // 
@@ -492,15 +473,37 @@
             this.btnImport.UseVisualStyleBackColor = true;
             this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
-            // btnClear
+            // ColNim
             // 
-            this.btnClear.Location = new System.Drawing.Point(331, 29);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(97, 40);
-            this.btnClear.TabIndex = 4;
-            this.btnClear.Text = "Clear";
-            this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            this.ColNim.DataPropertyName = "nim";
+            this.ColNim.HeaderText = "NIM";
+            this.ColNim.MinimumWidth = 6;
+            this.ColNim.Name = "ColNim";
+            this.ColNim.Width = 125;
+            // 
+            // ColNamaMahasiswa
+            // 
+            this.ColNamaMahasiswa.DataPropertyName = "nama";
+            this.ColNamaMahasiswa.HeaderText = "Nama";
+            this.ColNamaMahasiswa.MinimumWidth = 6;
+            this.ColNamaMahasiswa.Name = "ColNamaMahasiswa";
+            this.ColNamaMahasiswa.Width = 125;
+            // 
+            // ColJurusan
+            // 
+            this.ColJurusan.DataPropertyName = "jurusan";
+            this.ColJurusan.HeaderText = "Jurusan";
+            this.ColJurusan.MinimumWidth = 6;
+            this.ColJurusan.Name = "ColJurusan";
+            this.ColJurusan.Width = 125;
+            // 
+            // Foto
+            // 
+            this.Foto.DataPropertyName = "foto";
+            this.Foto.HeaderText = "Foto";
+            this.Foto.MinimumWidth = 6;
+            this.Foto.Name = "Foto";
+            this.Foto.Width = 125;
             // 
             // KelolaMahasiswa
             // 
@@ -581,10 +584,10 @@
         private System.Windows.Forms.TextBox txtFilePath;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNim;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColNamaMahasiswa;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColJurusan;
         private System.Windows.Forms.DataGridViewTextBoxColumn Foto;
-        private System.Windows.Forms.Button btnClear;
     }
 }

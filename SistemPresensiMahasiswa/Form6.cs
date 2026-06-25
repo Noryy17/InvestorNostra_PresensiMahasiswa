@@ -53,7 +53,7 @@ namespace SistemPresensiMahasiswa
 
                 // REVISI: Jika Anda menggunakan query text, pastikan DAL mendukungnya.
                 // Jika DAL Anda mewajibkan Stored Procedure, gantilah string di bawah dengan nama SP Anda (misal: "sp_GetMatakuliah")
-                string queryTextOrSP = "SELECT kode_mk, nama_mk, sks FROM Matakuliah";
+                string queryTextOrSP = "sp_GetAllMatakuliah"; // Nama prosedur yang sudah dibuat di database
 
                 DataTable dtMatkul = db.ExecuteStoredProcedure(queryTextOrSP);
 
@@ -89,15 +89,13 @@ namespace SistemPresensiMahasiswa
 
             try
             {
-                // REVISI: Menggunakan query/SP berparameter aman lewat DAL tanpa membuat SqlConnection manual
-                // Dianjurkan mengganti query ini dengan nama Stored Procedure (misal: "sp_InsertMatakuliah") jika DAL hanya menerima SP
-                string queryTextOrSP = "INSERT INTO Matakuliah (kode_mk, nama_mk, sks) VALUES (@Kode_MK, @Nama_MK, @SKS)";
+                string queryTextOrSP = "sp_InsertMatakuliah";
 
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@Kode_MK", txtKodeMK.Text.Trim()),
-                    new SqlParameter("@Nama_MK", txtNamaMK.Text.Trim()),
-                    new SqlParameter("@SKS", Convert.ToInt32(txtSKS.Text.Trim()))
+                    new SqlParameter("@pKodeMK", txtKodeMK.Text.Trim()),
+                    new SqlParameter("@pNamaMK", txtNamaMK.Text.Trim()),
+                    new SqlParameter("@pSKS", Convert.ToInt32(txtSKS.Text.Trim()))
                 };
 
                 db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);
@@ -130,14 +128,14 @@ namespace SistemPresensiMahasiswa
             {
                 // REVISI: Migrasi ke DAL tersentralisasi berparameter
                 // Dianjurkan mengganti query ini dengan nama Stored Procedure (misal: "sp_UpdateMatakuliah") jika diperlukan
-                string queryTextOrSP = "UPDATE Matakuliah SET kode_mk = @KodeBaru, nama_mk = @Nama_MK, sks = @SKS WHERE kode_mk = @KodeAsli";
+                string queryTextOrSP = "sp_UpdateMatakuliah";
 
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@KodeBaru", txtKodeMK.Text.Trim()),
-                    new SqlParameter("@Nama_MK", txtNamaMK.Text.Trim()),
-                    new SqlParameter("@SKS", Convert.ToInt32(txtSKS.Text.Trim())),
-                    new SqlParameter("@KodeAsli", kodeMkAsli)
+                    new SqlParameter("@pKodeBaru", txtKodeMK.Text.Trim()),
+                    new SqlParameter("@pNamaMK", txtNamaMK.Text.Trim()),
+                    new SqlParameter("@pSKS", Convert.ToInt32(txtSKS.Text.Trim())),
+                    new SqlParameter("@pKodeAsli", kodeMkAsli)
                 };
 
                 db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);
@@ -169,11 +167,11 @@ namespace SistemPresensiMahasiswa
                 try
                 {
                     // REVISI: Menghapus data menggunakan eksekusi terpusat DAL berparameter
-                    string queryTextOrSP = "DELETE FROM Matakuliah WHERE kode_mk = @Kode_MK";
+                    string queryTextOrSP = "sp_DeleteMatakuliah";
 
                     SqlParameter[] parameters = new SqlParameter[]
                     {
-                        new SqlParameter("@Kode_MK", txtKodeMK.Text.Trim())
+                        new SqlParameter("@pKodeMK", txtKodeMK.Text.Trim())
                     };
 
                     db.ExecuteNonQueryStoredProcedure(queryTextOrSP, parameters);

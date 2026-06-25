@@ -163,10 +163,11 @@ namespace SistemPresensiMahasiswa
 
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@pNIM", txtNIM.Text.Trim()),
-                    new SqlParameter("@pNama", txtNama.Text.Trim()),
-                    new SqlParameter("@pJurusan", txtJurusan.Text.Trim()),
-                    new SqlParameter("@pFoto", fotoParamValue)
+                    new SqlParameter("@NIM", SqlDbType.VarChar) { Value = txtNIM.Text.Trim() },
+                    new SqlParameter("@Nama", SqlDbType.VarChar) { Value = txtNama.Text.Trim() },
+                    new SqlParameter("@Jurusan", SqlDbType.VarChar) { Value = txtJurusan.Text.Trim() },
+                    // Menambahkan pengecekan tipe data untuk foto
+                    new SqlParameter("@Foto", SqlDbType.VarBinary) { Value = fotoParamValue }
                 };
 
                 db.ExecuteNonQueryStoredProcedure("sp_InsertMahasiswaBaru", parameters);
@@ -268,18 +269,23 @@ namespace SistemPresensiMahasiswa
 
         private void btnInject_Click(object sender, EventArgs e)
         {
+            // Contoh: Mengambil NIM dari textbox untuk di-inject
+            string nimTarget = txtNIM.Text.Trim();
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+        new SqlParameter("@NIM", nimTarget)
+            };
+
             try
             {
-                // PERBAIKAN: Hindari raw text SQL jika DAL mewajibkan Stored Procedure
-                SqlParameter[] parameters = new SqlParameter[] { new SqlParameter("@pNIM", txtNIM.Text) };
                 db.ExecuteNonQueryStoredProcedure("sp_SimulasiHackedNama", parameters);
-
-                MessageBox.Show("Eksperimen selesai.", "Eksperimen SQLi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LoadData();
+                MessageBox.Show("Simulasi Hacked berhasil dijalankan!");
+                LoadData(); // Refresh grid agar perubahan terlihat
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Aktivitas Ditolak Keamanan Database! \n\nDetail: " + ex.Message, "Proteksi Aktif", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show("Gagal: " + ex.Message);
             }
         }
 

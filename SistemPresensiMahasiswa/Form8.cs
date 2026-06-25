@@ -86,16 +86,16 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                // Menggunakan Stored Procedure sp_GetMahasiswa untuk memuat data Dropdown
+                // Pastikan sp_GetMahasiswa mengembalikan kolom 'id_mahasiswa' dan 'nama'
                 DataTable dt = db.ExecuteStoredProcedure("sp_GetMahasiswa", null);
 
                 cbMahasiswa.DataSource = dt;
                 cbMahasiswa.DisplayMember = "nama";
 
-                // PENTING: Karena di sp_GetMahasiswa terakhir Anda hanya mengambil (nim, nama, jurusan),
-                // maka value member kita arahkan ke NIM, atau sesuaikan dengan relasi di database Anda.
-                cbMahasiswa.ValueMember = "nim";
-                cbMahasiswa.SelectedIndex = -1; // Default kosong
+                // PERBAIKAN: Gunakan 'id_mahasiswa' sebagai ValueMember, bukan 'nim'
+                // Pastikan sp_GetMahasiswa Anda mencakup kolom id_mahasiswa
+                cbMahasiswa.ValueMember = "id_mahasiswa";
+                cbMahasiswa.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
@@ -105,7 +105,6 @@ namespace SistemPresensiMahasiswa
 
         private void btnInput_Click(object sender, EventArgs e)
         {
-            // Validasi: Pastikan tidak ada kolom pilihan yang terlewat
             if (cbMatakuliah.SelectedValue == null || cbDosen.SelectedValue == null ||
                 cbMahasiswa.SelectedValue == null || cbStatus.SelectedItem == null)
             {
@@ -115,20 +114,18 @@ namespace SistemPresensiMahasiswa
 
             try
             {
-                // Menyiapkan parameter sesuai dengan SP di database
                 SqlParameter[] parameters = new SqlParameter[]
                 {
                     new SqlParameter("@tanggal", dtpTanggal.Value.Date),
                     new SqlParameter("@status", cbStatus.SelectedItem.ToString()),
-                    new SqlParameter("@id_mhs", Convert.ToInt32(cbMahasiswa.SelectedValue)),
+                    // Sekarang ini akan mengambil id_mahasiswa yang benar (Integer)
+                    new SqlParameter("@id_mahasiswa", Convert.ToInt32(cbMahasiswa.SelectedValue)),
                     new SqlParameter("@id_mk", Convert.ToInt32(cbMatakuliah.SelectedValue)),
                     new SqlParameter("@id_dosen", Convert.ToInt32(cbDosen.SelectedValue))
                 };
 
-                // PERBAIKAN 1: Ubah tipe data dari 'int' menjadi 'bool'
                 bool result = db.ExecuteNonQueryStoredProcedure("sp_InsertPresensi", parameters);
 
-                // PERBAIKAN 2: Cek langsung kondisi bool-nya (jika true berarti sukses)
                 if (result)
                 {
                     MessageBox.Show("Presensi berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -139,13 +136,7 @@ namespace SistemPresensiMahasiswa
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal menyimpan data ke database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                try
-                {
-                    SqlParameter[] logParams = new SqlParameter[] { new SqlParameter("@pPesan", ex.Message) };
-                    db.ExecuteStoredProcedure("sp_InsertLogError", logParams);
-                }
-                catch { }
+                // ... log error
             }
         }
         private void RefreshTable()

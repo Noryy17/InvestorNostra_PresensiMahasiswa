@@ -37,12 +37,19 @@ namespace SistemPresensiMahasiswa
         {
             try
             {
-                DataTable dt = db.ExecuteStoredProcedure("sp_GetMatakuliah");
+                DataTable dt = db.ExecuteStoredProcedure("sp_GetMatakuliah", null);
+
+                // Tambahkan ini untuk debugging:
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Data Mata Kuliah tidak ditemukan di database (DataTable kosong).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
                 cbMatakuliah.DataSource = dt;
                 cbMatakuliah.DisplayMember = "nama_mk";
                 cbMatakuliah.ValueMember = "id_matakuliah";
-                cbMatakuliah.SelectedIndex = -1; // Set default kosong agar rapi
+                cbMatakuliah.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
